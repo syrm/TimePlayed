@@ -1,0 +1,22 @@
+%serverName%'s %game% leaderboard:
+----------------- WEEKLY -----------------
+1. %weekly1-name%#%weekly1-tag% 👑 - %weekly1-time%
+2. %weekly2-name%#%weekly2-tag% - %weekly2-time%
+3. %weekly3-name%#%weekly3-tag% - %weekly3-time%
+4. %weekly4-name%#%weekly4-tag% - %weekly4-time%
+5. %weekly5-name%#%weekly5-tag% - %weekly5-time%
+----------------- TODAY -----------------
+1. %daily1-name%#%daily1-tag% 👑 - %daily1-time%
+2. %daily2-name%#%daily2-tag% - %daily2-time%
+3. %daily3-name%#%daily3-tag% - %daily3-time%
+4. %daily4-name%#%daily4-tag% - %daily4-time%
+5. %daily5-name%#%daily5-tag% - %daily5-time%
+----------------- ALWAYS* -----------------
+1. %always1-name%#%always1-tag% 👑 - %always1-time%
+2. %always2-name%#%always2-tag% - %always2-time%
+3. %always3-name%#%always3-tag% - %always3-time%
+4. %always4-name%#%always4-tag% - %always4-time%
+5. %always5-name%#%always5-tag% - %always5-time%
+------------------------------------------------
+Last updated at: `%updatedAt%`
+**Note**: I joined this server `%joinedAgo%`, the times I started measuring your playtime can vary per user.
