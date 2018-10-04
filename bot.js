@@ -1,3 +1,4 @@
+// MADE BY XVAQL
 var beta;
 if(__filename.endsWith("beta.js")) {
   beta = true
