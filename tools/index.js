@@ -17,7 +17,5 @@ exports.setTerms = require('./setTerms.js')
 exports.lastPlayed = require('./lastPlayed.js')
 exports.filterTerms = require('./filterTerms.js')
 
-exports.premiumCheck = require('./premiumCheck.js');
-
 //exports.setTerms2 = require('./setTerms2.js') // Alleen beta.js
 //exports.topGames2 = require('./topGames2.js')
