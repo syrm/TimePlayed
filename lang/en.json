@@ -1,0 +1,280 @@
+{
+    "errors": {
+        "privateMention": "Sorry, %person% has set their playtime to private!",
+        "noGroupPM": "Sorry, I'm not available in PM channels, please run my commands in a server text channel.",
+        "noPMCommand": "I'm sorry, that command is not available in PM. To get a list of commands that are supported in PM, type `%prefix%help`.",
+        "noSpeakPerms": "Hi there, I saw you were trying to run the `%message.content%` command in the `%message.guild.name%` server, but I don't have the permissions to speak there! Please ask a server admin to give me the `Send Messages` permission or try to run my commands in another channel.",
+        "noBots": "Sorry, I don't log the playtime of bots!",
+        "premiumOnly": "Error: the leaderboard function is premium-only! To use this function, become a patreon at <https://www.patreon.com/TimePlayed>",
+        "noRankingChannel": "Error: this server hasn't set a ranking channel! Please ask a server admin to run the `%prefix%setConfig rankingChannel (#channel)` command to set a ranking channel.",
+        "noLeaderboardFile": "Sorry, I can't find this servers leaderboard. Please try again later or report this as a bug.",
+        "mentionNotFound": "I don't share a server with the user you mentioned, so I can't log his playtime!",
+        "noPMMention": "Sorry, I don't support mentions in PM. If you wish to get information about someone else, please run this command in a server I'm in.",
+        "helpCommandNotFound": "I can't find the full description of the command you specified! Type `%prefix%help` to get a list of all my commands.",
+        "noPermission": "Sorry, you need the `administrator` permission in this server to do that!.",
+        "tooMuchSince": "Please make the custom since not more than a 2 digit number! I can't handle more!",
+        "firstTime": "Hi there! I see it's the first time you're using me.\nBecause I collect privacy sensitive information from you, I need you to accept to the terms of service.",
+        "stillAccept": "Hi there! I see you have previously declined my terms of service, so to use my commands please still accept them.",
+        "reactionMessage": "\nReact with ✅ to accept my terms of service, ignore this message to decline.",
+        "commandMessage": "\nPlease type `%prefix%accept` to accept to my terms of service.",
+        "acceptMessageSuffix": "\nBy accepting you basically **give me the permission to log your playtime data** using your Discord presence.\nMy full Terms of Service are available at https://timeplayed.xyz/terms-of-service.html",
+        "mentionNoAccept": "The user you mentioned declined/didn't yet accept my terms of service, so I can't show you their playtime!\nAsk them to run any of my commands and accept to the terms of service to view their playtime."
+    },
+    "general": {
+        "termsAccepted": "Success! From now on, I will log your playtime, so please try out some of my commands!\nOf course I can't look back in time, so please don't expect that I already have your playtime logged, from now on I will start logging it.",
+        "globalAccept": "​​​​Hi members of `%guild%`, I'm TimePlayed. I'm a bot that logs your playtime, so you can keep track of which games you play.\nIf you want me to track your playtime, please react with ✅ to accept to my Terms of Service (https://timeplayed.xyz/terms-of-service.html).\nAfter reacting, I will start logging your playtime!"
+    },
+    "vars": {
+        "prefix": "%prefix%"
+    },
+    "warnings": {
+        "sinceWarning": "\n**Warning**: this information is inaccurate, because I started measuring your playtime later than the time you specified.\n(playtime measured since %startDateString%)",
+        "realityWarning": "\nPlease realize that this information is **based on Discord presences** and it can deviate from reality."
+    },
+    "colors": {
+        "lightGreen": "#0x00AE86"
+    },
+    "commands": {
+        "timePlayed": {
+            "args": "[@user] [time] [game]",
+            "aliases": ["tp", "playtime"],
+            "helpDescription": "View your playtime, of a specific game or in a specific time period",
+            "category": "Playtime commands",
+            "fullDescription": "This will give you information about someone's playtime (based on Discord presences). You can specify the time period (e.a. 10h/3d/10w) this information is measured, and specify a game. When no game is specified, you will get your playtime of the server's default game.",
+            "PMSupport": true,
+            "playtimeCommand": true,
+            "title": "%possessiveUpper% %game% playtime",
+            "customSince": "%customSince%, %person% %have% played `%timePlayedCustom%` %game%!",
+            "noPlaytime": "%personUpper% %have%n't (according to Discord) ever played `%game%` since I measured %possessive% playtime! If you think this is a mistake, please take a good look at https://timeplayed.xyz/faq-support.html#noGame\n(playtime measured since `%startDateString%`)",
+            "weekTitle": "7 days",
+            "week": "In the last 7 days, %person% %have% played `%timePlayedWeek%` %game%",
+            "weekNoInfo": "%possessiveUpper% data %have%n't been logged since %startDateString%, so I can't show you this information!",
+            "dayTitle": "Today",
+            "day": "Today, %person% %have% played `%timePlayedDay%` %game%",
+            "dayNoInfo": "%possessiveUpper% data %have% only been logged since %startDateString%, so I can't show you this information!",
+            "allTitle": "Total*",
+            "all": "%personUpper% %have% played `%timePlayedAll%` %game%",
+            "footer": "*%possessiveUpper% playtime is measured since %startDateString%"
+        },
+        "topPlayed": {
+            "args": "[@user] [time]",
+            "aliases": ["top", "topp", "topgames", "gamestop"],
+            "helpDescription": "Get a list of games you play the most",
+            "category": "Playtime commands",
+            "fullDescription": "This command gives you a list of games you (or someone) play(s) the most. You can specify the time period since when the information will be given.",
+            "PMSupport": true,
+            "playtimeCommand": true,
+            "noGame": "I don't excactly know what you mean by the `%arg%` argument. It could be two things:\n- If you are trying to specify a game: please use the `%prefix%timePlayed` command instead\n- If you're trying to specify a custom since time: please take a look at this page: https://timeplayed.xyz/commands.html or type `%prefix%help`",
+            "noGameEver": "%possessiveUpper% %have%n't (according to Discord) ever played a game since I measured %possessive% playtime! If you think this is a mistake, please take a good look at https://timeplayed.xyz/faq-support.html#noGame\n(playtime measured since %startDateString%)\n",
+            "noGamePeriod": "**%possessiveUpper% %have%n't played any game in that time period!**",
+            "title": "\n%possessiveUpper% most played games are:\n",
+            "titleCustomSince": "\n%customSince%, %possessive% most played games are:\n",
+            "title2": "%personUpper% %have% played %hours% hours of games:",
+            "titleCustomSince2": "%customSince%, %person% %have% played %hours% hours of games:",
+            "measuredSince": "\nThis information is measured since %startDateString%"
+        },
+        "playing": {
+            "args": "[game]",
+            "aliases": [],
+            "helpDescription": "Get a list of people playing a game in the current server",
+            "category": "Playtime commands",
+            "fullDescription": "This command gives you a list of people who are playing a game in the server you run this command in. To avoid insanity in big servers, if more than 20 users are playing the game, I will only show you the first 20. If you specify no game, the server's default game will be taken.",
+            "PMSupport": false,
+            "noOne": "In this server, nobody is playing %game%, you'll have to play with yourself :rolling_eyes:\n",
+            "one": "**In this server, one person is playing %game%:**\n",
+            "more": "In this server, **%count% people are playing %game%:**\n",
+            "moreThanTwenty": "**And %more% more people, but that would be too many to count!**"
+        },
+        "serverTop": {
+            "args": "[@user]",
+            "aliases": [],
+            "helpDescription": "View your personal leaderboard stats/placement",
+            "category": "Playtime commands",
+            "fullDescription": "Get the place of someone in the server's leaderboard. The game will be the server's default game. This command requires the server to have a ranking channel and to have TimePlayed Premium.",
+            "PMSupport": false,
+            "playtimeCommand": true,
+            "title": "%possessiveUpper% leaderboard place",
+            "checkRankingChannel": "Check the top %amount% users in the %rankingChannel% channel",
+            "noWeekly": "In the last 7 days, you haven't played any %game%",
+            "noDaily": "You haven't played %game% today!",
+            "noPlaytime": "%personUpper% %have%n't ever played `%game%` since I measured %possessive% playtime, so %person% is not placed in the leaderboard!\n(playtime measured since `%startDateString%`)",
+            "weekTitle": "Weekly",
+            "weekly": "In the week list %person% %be% ranked: **%placeWeek%** *(%timePlayedWeek%)*",
+            "dayTitle": "Daily",
+            "daily": "In the day list %person% %be% ranked: **%placeDay%** *(%timePlayedDay%)*",
+            "allTitle": "Total",
+            "all": "In the total list %person% %be% ranked: **%placeAll%** *(%timePlayedAll%)*",
+            "footer": "Leaderboard updated at: %updatedAt%"
+        },
+        "lastPlayed": {
+            "args": "[@user] [game]",
+            "aliases": [],
+            "helpDescription": "Check when someone last played a game",
+            "category": "Playtime commands",
+            "fullDescription": "Check when someone last played a game",
+            "PMSupport": true,
+            "playtimeCommand": true,
+            "rightNow": "%personUpper% %be% playing %game% right now!",
+            "message": "%personUpper% last played %game% **%result%**"
+        },
+        "status": {
+            "args": "[@user]",
+            "aliases": ["lastonline", "userinfo"],
+            "helpDescription": "View the status info of someone",
+            "category": "Playtime commands",
+            "fullDescription": "This command gives you the status of someone, what game they are playing and whether their presence is set to online/idle/DND. A 'Last Online' section will be added to this command on August 14, 2018.",
+            "PMSupport": true,
+            "title": "%possessiveUpper% status",
+            "gamePlaying": "%personUpper% %be% currently %type%",
+            "presence": "%possessiveUpper% Discord presence is set to: **%presence%**",
+            "noGame": "According to Discord %person% %be%n't playing a game"
+        },
+        "help": {
+            "args": "",
+            "aliases": [],
+            "helpDescription": "Get a list of all my commands",
+            "category": "General commands",
+            "fullDescription": "Very funny, the help command is what you're doing right now :thinking:. Anyway, this simply gives you a list of all of my commands. That's as clear as it gets :shrug:",
+            "PMSupport": true,
+            "title": "Command help!",
+            "description": "Here you'll find a list of all of my commands!\n- () arguments are required, [] arguments are optional.\n- Type `%prefix%help (command)` for an extended command description\n- The prefix in this server is `%prefix%`\n- The [time] argument should be specified as a number with `m/h/d/w` behind it or as `today`, for example: `%prefix%topPlayed 5d`",
+            "PMDescription": "Here you'll find a list of all of my commands!\n- () arguments are required, [] arguments are optional\n- Type `%prefix%help (command)` for an extended command description\n- These are only my PM supported commands, I have more commands, to get a list of them type `!!help` in a server text channel.\n- The prefix for PM commands is `!!`, or you can use my commands without any prefix\n- The [time] argument should be specified as a number with `m/h/d/w` behind it or as `today`, for example: `%prefix%topPlayed 5d`",
+            "linksTitle": "Useful links",
+            "links": "[Website](https://timeplayed.xyz) | [Support Server](https://discord.gg/ghErkyt) | [Patreon](https://www.patreon.com/TimePlayed) | [Invite me](http://invite.timeplayed.xyz) | [Terms of Service](https://timeplayed.xyz/terms-of-service.html)",
+            "fullDescriptionDescription": "Welcome to the full info page of the **%command%** command.",
+            "syntax": "The correct syntax of this command is: `%syntax%`"
+        },
+        "removeGame": {
+            "args": "(game)",
+            "aliases": ["deletegame"],
+            "category": "General commands",
+            "helpDescription": "Completely remove a game from your playtime",
+            "fullDescription": "This command will remove a specified game completely from the database. This command can be used when accidentally adding a wrong game name or when you just want a game out of your playtime list.",
+            "PMSupport": true
+        },
+        "botinfo": {
+            "args": "",
+            "aliases": ["info"],
+            "category": "General commands",
+            "helpDescription": "Get some cool information about me",
+            "fullDescription": "This command gives you some cool information about me, my member count, server count, last restart, credits and some useful links.",
+            "PMSupport": true
+        },
+        "invite": {
+            "args": "",
+            "aliases": [],
+            "category": "General commands",
+            "helpDescription": "Get a link to invite me to your server",
+            "fullDescription": "This command simply gives you a link to invite the bot to your server, along with some getting started information.",
+            "PMSupport": true,
+            "msg": "Here's my invite link: <http://invite.timeplayed.xyz/>\nIf it doesn't work please try this one: <https://discordapp.com/oauth2/authorize?client_id=433625399398891541&scope=bot&permissions=268708928>\nAnd here's some help to get started with me: <https://timeplayed.xyz/getting-started.html>"
+        },
+        "setPrivacy": {
+            "args": "",
+            "aliases": ["setprivate", "privacy", "private"],
+            "helpDescription": "Change your playtime privacy settings",
+            "category": "Privacy commands",
+            "fullDescription": "This command will change your privacy setting. No arguments are required, further instructions will be given after running this command. \nWhen setting your playtime to private globally, no one (except yourself) will be able to see your playtime anymore.\nBy setting it to private locally (only in the server you run the command in), no one in that server (except yourself) will be able to see your playtime.",
+            "PMSupport": false,
+            "privateLocal": "Success! Your playtime will now be private in this server, but **it may still be visible in some other servers** if your global playtime is set to public.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
+            "privateGlobal": "Success! Your playtime will now be private in every server you and I are in, but **it may still be visible in some other servers** if you have set your playtime to public locally in servers.\nTo set your playtime to private per server, type `%prefix%setPrivacy private local` in the server you want to make your playtime private.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
+            "alreadyPrivateLocal": "Your playtime is already set to private for this server! To make it globally private, run the `%prefix%setPrivacy private` command.",
+            "alreadyPrivateGlobal": "Your playtime is already set to private globally! To make an exception for this server, run the `%prefix%setPrivacy private local` command.",
+            "publicLocal": "Success! You and **all members of this server** will now be able to view your playtime.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
+            "publicGlobal": "Success! You and **everyone you and I share a server with** will now be able to view your playtime.\nTo set your playtime of this server explicitly to public, type `%prefix%allow local`.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
+            "alreadyPublicLocal": "Your playtime is already set to public for this server!",
+            "alreadyPublicGlobal": "Your playtime is already set to public globally! To make an exception for this server, run the `%prefix%allow local` command.",
+            "choices": "What will your new privacy setting be? Choose from these 3 options and react with your choice:\n- 🇦 : Set your playtime to private, only in this server\n- 🇧 : Set your playtime to private, in every server (you can still view your own playtime)\n- 🇨 : Set your playtime back to public for every server",
+            "localPrivate": "Success! From now on, only you will be able to view your playtime in this server, no one else!",
+            "globalPrivate": "Success! From now on, only you will be able to view your playtime, no one else!",
+            "globalPublic": "Success! From now on, your playtime will be public in **every server** you and I share."
+        },
+        "acceptMessage": {
+            "args": "",
+            "aliases": ["acceptmsg"],
+            "helpDescription": "Get a Terms of Service message everyone can react to",
+            "category": "Privacy commands",
+            "fullDescription": "This command sends a global accept message in the channel you run this command in. Everyone can react with ✅, and accept to the Terms of Service.\nYou could for example pin this message to your bot commands channel, so users can react to 1 message to accept instead of individually have to accept.",
+            "PMSupport": false
+        },
+        "accept": {
+            "args": "",
+            "aliases": [],
+            "helpDescription": "Comfirm that you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html)",
+            "category": "Privacy commands",
+            "fullDescription": "This command lets you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html). After running this command, I will start logging your playtime and you will be able to use my commands.",
+            "PMSupport": false
+        },
+        "erase": {
+            "args": "",
+            "aliases": [],
+            "helpDescription": "Erase ALL your playtime data",
+            "category": "Privacy commands",
+            "fullDescription": "Don't run this command for fun, it's a serious one. This command will erase all data I have from you from the database, including all your playtime, last online, and measuring start date.\nAfter running this command I will stop running your playtime. You will have to accept to the Terms of Service again after using this command, then I will start logging again.",
+            "PMSupport": true,
+            "confirmation": "Are you 100% sure?\nThis action will **erase ALL your data** from the playtime database, and I will stop logging your playtime.\nThis action can **NOT** be undone!\nReact with ✅ to confirm this action, to cancel, ignore this message."
+        },
+        "setConfig": {
+            "args": "(key) (value)",
+            "aliases": ["sc", "settings", "setting", "setconf"],
+            "helpDescription": "Change a value of the server config",
+            "category": "Admin commands",
+            "fullDescription": "This command lets you change a config value. To get a list of available options, type `%prefix%showConfig`.\nHere's an example: if I want to change the server's prefix to `?` I'd have to run the command: `%prefix%setConfig prefix ?`\nPlease note that the config keys are **case sensitive**.",
+            "PMSupport": false,
+            "availableValues": {
+                "prefix": "string",
+                "rankingChannel": "textChannel",
+                "enableRankingMentions": "boolean",
+                "defaultGame": "string",
+                "leaderboardAmount": "number"
+            },
+            "noValidChannel": "I can't find the channel you're looking for. Either I can't read messages in the channel, or it's not a valid text channel.",
+            "noRankingPermissions": "Error: I don't have the sufficient permissions in the %channel% channel to send/manage my leaderboard. \nPlease give me the `%permission%` permission and run this command again.",
+            "moreThanTen": "Erro: the maximum leaderboard amount value is 10!",
+            "wrongDataType": "That's the wrong data type for that setting! The `%key%` setting should be a `%type%`",
+            "unknownSetting": "I don't know that setting!\nAvailable settings are:\n%availableSettings%\nPlease note that all keys (setting names) are case sensitive. Visit this page for more help: <https://goo.gl/q9voUa>",
+            "roleAwards": "To change role awards, please use the `%prefix%addRole` command. To view all role awards, use the `%prefix%showRoles` command.",
+            "success": "Success! I've set the setting %key% to: `%value%` succesfully!"
+        },
+        "showConfig": {
+            "args": "",
+            "aliases": ["showconf", "viewconfig", "viewconf", "viewsettings", "showsettings"],
+            "helpDescription": "View the server config",
+            "category": "Admin commands",
+            "fullDescription": "This command shows you the current server configuration. Can't be more clear than that :shrug:",
+            "PMSupport": false
+        },
+        "addRole": {
+            "args": "(@role/roleID/role Name) (time)/(time) [game]",
+            "aliases": ["addreward", "newreward", "newaward"],
+            "helpDescription": "Automatically assign roles to users when they reach a specified amount of playtime in a period of time",
+            "category": "Admin commands",
+            "fullDescription": "This command adds a role award to the server, a specified role will be given when members of this server reach a specified amount of playtime, of a specified game in a specified period of time.\nThe first `(time)` of the `(time)/(time)` argument should be the amount of playtime users need to reach, the second `(time)` needs to be the period of time the playtime needs to be in.\nHere's an example: when I want to assign the Tryhard role to users when they play more than 10 hours per week Overwatch, I'll have to run the following command: `%prefix%addRole Tryhard 10h/week Overwatch`",
+            "PMSupport": false,
+            "noPermission": "I don't have the permission to assign roles to users! Please go to my role in the server settings, turn on the `Manage Roles` permission and run this command again.",
+            "cantFindRole": "I can't find the role you specified (%role%)! Please mention the role, give me the ID or give me the name of the role and run this command again.\nPlease note that the role names are **case sensitive**.",
+            "threeRolesMax": "You can only add up to 3 role awards without premium! To add more roles, remove a role by typing `%prefix%removeRole` or buy premium.",
+            "tenRolesMax": "You can only add up to 10 role awards! If you really wish to add more role awards (which seems unlikely), please contact me on Discord for a custom premium plan (my Discord name is: xVaql#4581)",
+            "roleTooHigh": "The role you tried to assign is positioned higher or equal than my highest role, so I can't assign that role to users. Please move my role above the role you tried to assign, or move the role you tried to assign underneath my role and run this command again.",
+            "alreadyAssigned": "That role is already assigned automatically in this server! You can't add two role awards to avoid collisons and unexpected errors, so please create another role for this award or remove the role with `%prefix%removeRole`",
+            "success": "Success! Users will now automatically get the %role% role awarded when playing more than `%neededTime%/%timePeriod%` `%game%`.\n",
+            "defaultGameNote": "\nNote: you didn't specify a game, so I took the server's default game (`%game%`)"
+        },
+        "removeRole": {
+            "args": "",
+            "aliases": ["removereward", "deleterole", "deletereward", "removeaward", "deleteaward"],
+            "helpDescription": "Remove a playtime role award",
+            "category": "Admin commands",
+            "fullDescription": "This command removes a playtime role award, when running `%prefix%removeRole` without any arguments you will get a list with the current role awards, there you'll be able to choose which award to remove.",
+            "PMSupport": false
+        },
+        "showRoles": {
+            "args": "",
+            "aliases": ["showrewards", "rolelist", "rewardlist", "showawards"],
+            "helpDescription": "Show the roles award in this server",
+            "category": "Admin commands",
+            "fullDescription": "This command gives you a list of all role awards in the current server, with all their information provided.",
+            "PMSupport": false
+        }
+    }
+}
