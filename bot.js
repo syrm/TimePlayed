@@ -1,4 +1,4 @@
-// Test
+// Made by xVaql#4581
 const keys = require('./keys.json');
 var beta;
 if(keys.beta) {
