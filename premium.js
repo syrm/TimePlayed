@@ -16,21 +16,24 @@ Array.prototype.clean = function(deleteValue) {
 };
 
 function checkPremium() {
-  var supportServer = client.guilds.find(x => x.id === "433531223244013572")
-  supportServer.members.forEach(function(member){
-    if(member.roles.find(x => x.name === "TimePlayed Premium💛")) {
-      if(fs.existsSync(`./data/premiumUsers/${member.user.id}.txt`) == false) {
+  connection.query("SELECT userID FROM premium", function(error, results, fields) {
+    var supportServer = client.guilds.find(x => x.id === "433531223244013572")
+    supportServer.members.forEach(function(member){
+      var registered = results.map(e => e.userID).includes(member.id);
+      var hasPremium = member.roles.find(x => x.name === "TimePlayed Premium💛")
+      if(hasPremium && !registered) {
         supportServer.channels.get("433631612991963136").send(`<@${member.user.id}>, I see you're a TimePlayed Premium supporter! Go type \`!addPremium (server ID)\` in this channel to claim your premium features!`)
-        fs.appendFileSync(`./data/premiumUsers/${member.user.id}.txt`, ``)
-        console.log(`Found new user (${member.user.tag}), added to the list and message sent`)
+        connection.query("INSERT INTO premium (userID) VALUES (?)", [member.id], function(error, results, fields) {
+          console.log(`Found new user (${member.user.tag}), added to the list and message sent`)
+        })
       }
-    } else {
-      if(fs.existsSync(`./data/premiumUsers/${member.user.id}.txt`)) {
-        fs.unlinkSync(`./data/premiumUsers/${member.user.id}.txt`)
+      if(!hasPremium && registered) {
         supportServer.channels.get('433631612991963136').send(`<@${member.user.id}>, I see you're not a donator anymore, so I removed your premium features :slight_frown:\nAnyway, thanks for the support you gave!`)
-        console.log(`Removed user (${member.user.tag}) from the premium list.`)
+        connection.query("DELETE FROM premium WHERE userID=?", [member.id], function(error, results, fields) {
+          console.log(`Removed user (${member.user.tag}) from the premium list.`)
+        })
       }
-    }
+    })
   })
   console.log("Checked for premium users.")
 }
@@ -49,38 +52,46 @@ client.on("message", message => {
   }
   var command = message.content.replace(prefix, "").split(" ")[0].toLowerCase();
   var arg = message.content.replace(prefix + message.content.replace(prefix, "").split(" ")[0], "").split(" ").clean("");
-
-  if(command === "addpremium") {
-    if(fs.existsSync(`./data/premiumUsers/${message.author.id}.txt`) == false) {
-      return message.reply("You can only add/remove a premium server when you're a donator! Become a patron at <https://www.patreon.com/TimePlayed>")
-    } else {
-      if(fs.readFileSync(`./data/premiumUsers/${message.author.id}.txt`) == '') {
-        if(arg[0]) {
-          if(isNaN(arg[0]) || arg[0].length != 18) {
-            return message.reply(`Please provide the ID of the server you want to add (18 numbers long)`)
-          } else {
-            fs.appendFileSync(`./data/premiumUsers/${message.author.id}.txt`, arg[0])
-            return message.reply('Added that server to the premium list succesfully!')
+  connection.query("SELECT * FROM premium WHERE userID=?", [message.author.id], function(error, results, fields) {
+    var premium = results.length > 0
+    var alreadyGuild = false;
+    results.forEach(result => {
+      if(result.guildID) alreadyGuild = true;
+    })
+    if(command === "addpremium") {
+      if(!premium) {
+        return message.reply("You can only add/remove a premium server when you're a donator! Become a patron at <https://www.patreon.com/TimePlayed>")
+      } else {
+        if(!alreadyGuild) {
+          if(arg[0]) {
+            if(isNaN(arg[0]) || arg[0].length != 18) {
+              return message.reply(`Please provide the ID of the server you want to add (18 numbers long)`)
+            } else {
+              connection.query("UPDATE premium SET guildID=? WHERE userID=?", [arg[0], message.author.id], function(error, results, fields) {
+                return message.reply('Added that server to the premium list succesfully!')
+              })
+            }
           }
+        } else {
+          return message.reply('You can only add 1 premium server! Use \`!removePremium\` to remove your current server from the premium list.')
         }
-      } else {
-        return message.reply('You can only add 1 premium server! Use \`!removePremium\` to remove your server from the premium list.')
       }
     }
-  }
-
-  if(command === "removepremium") {
-    if(fs.existsSync(`./data/premiumUsers/${message.author.id}.txt`) == false) {
-      return message.reply("You can only add/remove a premium server when you're a donator! Become a donator at https://www.patreon.com/TimePlayed")
-    } else {
-      if(fs.readFileSync(`./data/premiumUsers/${message.author.id}.txt`) == '') {
-        return message.reply('You don\'t have a premium server assigned, so there\'s nothing to remove! Use \`!addPremium (server ID)\` to add a premium server.')
+  
+    if(command === "removepremium") {
+      if(!premium) {
+        return message.reply("You can only add/remove a premium server when you're a donator! Become a donator at https://www.patreon.com/TimePlayed")
       } else {
-        fs.writeFileSync(`./data/premiumUsers/${message.author.id}.txt`, ``)
-        return message.reply('Removed your guild from the premium list succesfully! You can now add a new one by typing \`!addPremium (server ID)\`')
+        if(!alreadyGuild) {
+          return message.reply('You don\'t have a premium server assigned, so there\'s nothing to remove! Use \`!addPremium (server ID)\` to add a premium server.')
+        } else {
+          connection.query("UPDATE premium SET guildID = NULL WHERE userID=?", [message.author.id], function(error, results, fields) {
+            return message.reply('Removed your guild from the premium list succesfully! You can now add a new one by typing \`!addPremium (server ID)\`')
+          })
+        }
       }
     }
-  }
+  })
 
   var valid = false;
 
