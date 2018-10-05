@@ -13,12 +13,6 @@ var realityWarning = `Please realize that this information is **based on Discord
 
 // Require everything
 const Discord = require("discord.js")
-const fs = require('fs');
-const mysql = require("mysql")
-const tools = require("./tools")
-const en = require('./lang/en.json')
-const DBL = require("dblapi.js")
-var pool = require('./tools/pool.js')
 
 // Create client/stats poster
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fetchAllMembers: true});

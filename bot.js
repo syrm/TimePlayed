@@ -1,18 +1,14 @@
-// MADE BY XVAQL
+const keys = require('./keys.json');
 var beta;
-if(__filename.endsWith("beta.js")) {
+if(keys.beta) {
   beta = true
 } else {
   beta = false
 }
-const keys = require('./keys.json');
+
+
+var token = keys.botToken
 const key = keys.imageAPIKeys;
-var token;
-if(beta == true) {
-  token = keys.betaToken
-} else {
-  token = keys.botToken
-}
 var realityWarning = `Please realize that this information is **based on Discord presences** and it can deviate from reality.`
 
 // Require everything
@@ -63,8 +59,8 @@ function getRole(string, guildID) {
   if(string == undefined) return undefined;
   var guild = client.guilds.get(guildID);
   var roleID = string.replace("<@", "").replace(">", "");
-  if(guild.roles.get(roleID) != undefined) return guild.roles.get(roleID);
-  if(guild.roles.find(x => x.name == string) != undefined) return guild.roles.find(x => x.name == string);
+  if(guild.roles.get(roleID) != undefined) return message.guild.roles.get(roleID);
+  if(guild.roles.find("name", string) != undefined) return guild.roles.find("name", string);
   // If nothing was found, return undefined
   return undefined;
 }
@@ -377,17 +373,6 @@ client.on("message", message => {
     if(message.channel.type == "text" && commands.indexOf(command) != -1 && message.guild.me.permissionsIn(message.channel).has("SEND_MESSAGES") == false) {
       return message.author.send(lang.errors.noSpeakPerms.replace("%message.content%", message.content).replace("%message.guild.name%", guildName)).catch(err => console.log(`Error sending no permission message: ${err}`))
     }
-    // Log the command
-    fs.appendFileSync(`./logs/${guildID}.txt`, `${Date()}: User: ${message.author.tag}, Channel: #${message.channel.name}, Command: ${message.content}\n`);
-    console.log(`${new Date()}: User: ${message.author.tag}, Command: ${message.content}, guild: ${guildName}`)
-
-    // Check if the message guild is premium (will be used later)
-    var premium = false;
-    fs.readdirSync(`./data/premiumUsers/`).forEach(file => {
-      if(message.channel.type == "text" && fs.readFileSync(`./data/premiumUsers/${file}`) == message.guild.id) {
-        premium = true;
-      }
-    })
 
     // Return an error if a bot is mentioned and the user ran a playtime command
     if(playtimeCommands.indexOf(command) != -1 && mention && mention.bot) return message.reply(lang.errors.noBots)
@@ -405,9 +390,10 @@ client.on("message", message => {
     var defaultSinces = ['7d', 'today', undefined]
     var game = handledArgs.other
     var customSince = handledArgs.since
-
     // Execute the private check (async)
-    tools.termsCheck(message.author.id, mentionID, function(accept) {
+    tools.termsCheck(message.author.id, mentionID, guildID, function(results) {
+      accept = results[0]
+      premium = results[1]
       tools.privateCheck(mentionID, guildID, function(private) {
         var termsMSG;
         if(accept.executer == undefined && command != "accept") termsMSG = lang.errors.firstTime;

@@ -3,7 +3,7 @@ const token = 'NDM3OTY5OTY5NTkwOTYwMTM4.Db9y2g.-MFlUxfUZg5wv0SznnHNnUNftnk';
 const Discord = require("discord.js");
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true});
 const prefix = "!"
-var pool = require('./tools/pool.js')
+var connection = require('./tools/connection.js')
 
 Array.prototype.clean = function(deleteValue) {
   for (var i = 0; i < this.length; i++) {
@@ -85,16 +85,14 @@ client.on("message", message => {
   var valid = false;
 
   function deleteByID(iconID) {
-    pool.getConnection(function(error, connection) {
-      connection.query(`SELECT messageID FROM gameIcons WHERE ID=?`, [iconID], function(error, results, fields) {
-        if(results[0]) {
-          message.channel.fetchMessage(results[0].messageID).then(msg => {
-            msg.delete(3000)
-          })
-        }
-        connection.query("UPDATE gameIcons SET messageID=NULL, userID=NULL WHERE ID=?", [iconID], function(error, results, fields) {
-          connection.release()
+    connection.query(`SELECT messageID FROM gameIcons WHERE ID=?`, [iconID], function(error, results, fields) {
+      if(results[0]) {
+        message.channel.fetchMessage(results[0].messageID).then(msg => {
+          msg.delete(3000)
         })
+      }
+      connection.query("UPDATE gameIcons SET messageID=NULL, userID=NULL WHERE ID=?", [iconID], function(error, results, fields) {
+        connection.release()
       })
     })
   }
@@ -104,20 +102,18 @@ client.on("message", message => {
     if(message.channel.id != "475001642870374410") return message.reply("Please run this command in the <#475001642870374410> channel!").then(msg => {msg.delete(2000); message.delete(2000)})
     if(!arg[0]) return message.reply("Please provide an icon ID!").then(msg => {msg.delete(2000); message.delete(2000)})
     if(!arg[1]) return message.reply("Please provide a link with an icon of the ID!").then(msg => {msg.delete(2000); message.delete(2000)})
-    pool.getConnection(function(error, connection) {
-      connection.query(`SELECT iconURL FROM gameIcons WHERE ID=?`, [arg[0]], function(error, results, fields) {
-        if(results.length > 0) {
-          if(results[0].iconURL) return message.reply("That game has already been assigned to an image!").then(msg => {msg.delete(2000); message.delete(2000);})
-          connection.query(`UPDATE gameIcons SET iconURL=? WHERE ID=?`, [arg[1], arg[0]], function(error, results2, fields) {
-            connection.release()
-            message.reply("Icon assigned to game!").then(msg => {msg.delete(2000); message.delete(2000);})
-            return deleteByID(arg[0]);
-          })
-        } else {
+    connection.query(`SELECT iconURL FROM gameIcons WHERE ID=?`, [arg[0]], function(error, results, fields) {
+      if(results.length > 0) {
+        if(results[0].iconURL) return message.reply("That game has already been assigned to an image!").then(msg => {msg.delete(2000); message.delete(2000);})
+        connection.query(`UPDATE gameIcons SET iconURL=? WHERE ID=?`, [arg[1], arg[0]], function(error, results2, fields) {
           connection.release()
-          return message.reply(`Invalid ID: \`${arg[0]}\``).then(msg => {msg.delete(2000); message.delete(2000)})
-        }
-      })
+          message.reply("Icon assigned to game!").then(msg => {msg.delete(2000); message.delete(2000);})
+          return deleteByID(arg[0]);
+        })
+      } else {
+        connection.release()
+        return message.reply(`Invalid ID: \`${arg[0]}\``).then(msg => {msg.delete(2000); message.delete(2000)})
+      }
     })
   }
 
@@ -125,19 +121,17 @@ client.on("message", message => {
     valid = true;
     if(message.channel.id != "475001642870374410") return message.reply("Please run this command in the <#475001642870374410> channel!").then(msg => {msg.delete(2000); message.delete(2000)})
     if(!arg[0]) return message.reply("Please provide an icon ID!").then(msg => {msg.delete(2000); message.delete(2000)})
-    pool.getConnection(function(error, connection) {
-      connection.query(`SELECT iconURL FROM gameIcons WHERE ID=?`, [arg[0]], function(error, results, fields) {
-        if(results.length > 0) {
-          connection.query(`UPDATE gameIcons SET blocked=1 WHERE ID=?`, [arg[0]], function(error, results2, fields) {
-            connection.release()
-            message.reply("Icon request deleted").then(msg => {msg.delete(2000); message.delete(2000);})
-            return deleteByID(arg[0]);
-          })
-        } else {
+    connection.query(`SELECT iconURL FROM gameIcons WHERE ID=?`, [arg[0]], function(error, results, fields) {
+      if(results.length > 0) {
+        connection.query(`UPDATE gameIcons SET blocked=1 WHERE ID=?`, [arg[0]], function(error, results2, fields) {
           connection.release()
-          return message.reply(`Invalid ID: \`${arg[0]}\``).then(msg => {msg.delete(2000); message.delete(2000)})
-        }
-      })
+          message.reply("Icon request deleted").then(msg => {msg.delete(2000); message.delete(2000);})
+          return deleteByID(arg[0]);
+        })
+      } else {
+        connection.release()
+        return message.reply(`Invalid ID: \`${arg[0]}\``).then(msg => {msg.delete(2000); message.delete(2000)})
+      }
     })
   }
 
