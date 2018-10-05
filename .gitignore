@@ -64,3 +64,5 @@ keys.json
 data/
 old_versions/
 start.bat
+package-lock.json
+package.json
