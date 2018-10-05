@@ -375,6 +375,9 @@ client.on("message", message => {
       return message.author.send(lang.errors.noSpeakPerms.replace("%message.content%", message.content).replace("%message.guild.name%", guildName)).catch(err => console.log(`Error sending no permission message: ${err}`))
     }
 
+    // Log the command
+    console.log(`${new Date()}: User: ${message.author.tag}, Command: ${message.content}, guild: ${guildName}`)
+
     // Return an error if a bot is mentioned and the user ran a playtime command
     if(playtimeCommands.indexOf(command) != -1 && mention && mention.bot) return message.reply(lang.errors.noBots)
 
