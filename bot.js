@@ -1,3 +1,4 @@
+// Test
 const keys = require('./keys.json');
 var beta;
 if(keys.beta) {
