@@ -1,4 +1,4 @@
-// Made by xVaql#4581
+// Made by xVaql#4581, all rights reserved
 const keys = require('./keys.json');
 var beta;
 if(keys.beta) {
