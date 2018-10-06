@@ -458,15 +458,7 @@ client.on("message", message => {
             }
     
             if(command === "setprivacy") {
-              message.channel.send(lang.commands.setPrivacy.choices).then(msg => {
-                tools.awaitReaction(msg, ["🇦", "🇧", "🇨"], message.author.id, function(reaction, choice) {
-                  tools.setPrivacy(message.author.id, message.guild.id, choice, function(success) {
-                    if(choice == 0) return message.reply(lang.commands.setPrivacy.localPrivate)
-                    if(choice == 1) return message.reply(lang.commands.setPrivacy.globalPrivate)
-                    if(choice == 2) return message.reply(lang.commands.setPrivacy.globalPublic)
-                  })
-                })
-              })
+              execute.setPrivacy(message, lang)
             }
             
             if(command === "accept") {

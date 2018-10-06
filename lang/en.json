@@ -176,18 +176,11 @@
             "category": "Privacy commands",
             "fullDescription": "This command will change your privacy setting. No arguments are required, further instructions will be given after running this command. \nWhen setting your playtime to private globally, no one (except yourself) will be able to see your playtime anymore.\nBy setting it to private locally (only in the server you run the command in), no one in that server (except yourself) will be able to see your playtime.",
             "PMSupport": false,
-            "privateLocal": "Success! Your playtime will now be private in this server, but **it may still be visible in some other servers** if your global playtime is set to public.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
-            "privateGlobal": "Success! Your playtime will now be private in every server you and I are in, but **it may still be visible in some other servers** if you have set your playtime to public locally in servers.\nTo set your playtime to private per server, type `%prefix%setPrivacy private local` in the server you want to make your playtime private.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
-            "alreadyPrivateLocal": "Your playtime is already set to private for this server! To make it globally private, run the `%prefix%setPrivacy private` command.",
-            "alreadyPrivateGlobal": "Your playtime is already set to private globally! To make an exception for this server, run the `%prefix%setPrivacy private local` command.",
-            "publicLocal": "Success! You and **all members of this server** will now be able to view your playtime.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
-            "publicGlobal": "Success! You and **everyone you and I share a server with** will now be able to view your playtime.\nTo set your playtime of this server explicitly to public, type `%prefix%allow local`.\nTo undo this action, react with the ↩ emoji within 20 seconds.",
-            "alreadyPublicLocal": "Your playtime is already set to public for this server!",
-            "alreadyPublicGlobal": "Your playtime is already set to public globally! To make an exception for this server, run the `%prefix%allow local` command.",
-            "choices": "What will your new privacy setting be? Choose from these 3 options and react with your choice:\n- 🇦 : Set your playtime to private, only in this server\n- 🇧 : Set your playtime to private, in every server (you can still view your own playtime)\n- 🇨 : Set your playtime back to public for every server",
-            "localPrivate": "Success! From now on, only you will be able to view your playtime in this server, no one else!",
-            "globalPrivate": "Success! From now on, only you will be able to view your playtime, no one else!",
-            "globalPublic": "Success! From now on, your playtime will be public in **every server** you and I share."
+            "setPrivate": "Success! Your playtime will now be private in every server, but you can still view your own playtime.",
+            "alreadyPrivate": "Your playtime is already set to private!",
+            "setPublic": "Success! Everyone will now be able to view your playtime.",
+            "alreadyGlobal": "Your playtime is already set to public!",
+            "choices": "What will your new privacy setting be? Choose from these 2 options and react with your choice:\n- 🇦 : Set your playtime to private (you can still view your own playtime)\n- 🇧 : Set your playtime back to public"
         },
         "acceptMessage": {
             "args": "",

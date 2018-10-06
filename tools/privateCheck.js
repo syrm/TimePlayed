@@ -5,21 +5,8 @@ module.exports =  function(userID, guildID, callback) {
   connection.query(`SELECT * FROM privacy WHERE userID=${userID}`, function(error, results, fields) {
     var private = false;
     results.forEach(result => {
-      if(!result.guildID) {
-        if(result.value == 1) {
-          private = false;
-        } else {
-          private = true;
-        }
-      }
-    })
-    results.forEach(result => {
-      if(result.guildID == guildID) {
-        if(result.value == 1) {
-          private = false;
-        } else {
-          private = true;
-        }
+      if(result.value == 0) {
+        private = true;
       }
     })
     return callback(private)
