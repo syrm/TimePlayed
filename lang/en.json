@@ -196,7 +196,7 @@
             "helpDescription": "Comfirm that you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html)",
             "category": "Privacy commands",
             "fullDescription": "This command lets you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html). After running this command, I will start logging your playtime and you will be able to use my commands.",
-            "PMSupport": false
+            "PMSupport": true
         },
         "erase": {
             "args": "",
