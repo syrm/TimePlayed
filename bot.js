@@ -106,7 +106,6 @@ client.on("ready", () => {
   setInterval(() => {
     client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   }, 60000)
-  var count = 0;
   if(beta) return;
   connection.query("SELECT * FROM acceptMessages", function(error, results, fields) {
     if(error) throw error;
