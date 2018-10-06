@@ -1,3 +1,4 @@
+// Command list
 module.exports = {
     botinfo: require("./botInfo.js"),
     status: require("./status.js"),
