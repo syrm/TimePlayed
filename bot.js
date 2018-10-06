@@ -334,7 +334,10 @@ client.on("message", message => {
               lang: lang,
               meantUser: meantUser
             }
-            execute[command].call(undefined, info);
+            console.log(command)
+            if(execute[command]) {
+              execute[command].call(undefined, info);
+            }
         })
       })
       

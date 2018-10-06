@@ -14,6 +14,6 @@ module.exports = {
     help: require("./help.js"),
     erase: require("./erase.js"),
     invite: require("./invite.js"),
-    lastPlayed: require("./lastPlayed.js"),
+    lastplayed: require("./lastPlayed.js"),
     accept: require("./accept.js")
 }
