@@ -1,6 +1,9 @@
 const tools = require("../tools");
 var connection = tools.getConnection;
-module.exports = function(message, handledArgs, lang) {
+module.exports = function(obj) {
+    var message = obj.message;
+    var handledArgs = obj.handledArgs;
+    var lang = obj.lang;
     if(message.member.hasPermission("ADMINISTRATOR")) {
         if(Object.keys(lang.commands.setConfig.availableValues).includes(handledArgs.key)) {
             if(handledArgs.key == "rankingChannel" || handledArgs.key == "enableRankingMentions" || handledArgs.key == "leaderboardAmount") {

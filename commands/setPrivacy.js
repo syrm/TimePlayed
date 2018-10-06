@@ -1,6 +1,8 @@
 var tools = require("../tools")
 var connection = tools.getConnection
-module.exports = function(message, lang) {
+module.exports = function(obj) {
+  var message = obj.message;
+  var lang = obj.lang;
   message.channel.send(lang.commands.setPrivacy.choices).then(msg => {
     tools.awaitReaction(msg, ["🇦", "🇧"], message.author.id, function(reaction, choice) {
       connection.query(`SELECT * FROM privacy WHERE userID=?`, [message.author.id], function(error, results, fields) {

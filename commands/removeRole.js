@@ -1,8 +1,13 @@
 const tools = require("../tools");
 var connection = tools.getConnection;
-module.exports = function(message, handledArgs, guildConf, lang) {
-    var arg = [handledArgs.other];
-    if(message.member.hasPermission("ADMINISTRATOR")) {
+module.exports = function(obj) {
+  var message = obj.message;
+  var handledArgs = obj.handledArgs;
+  var guildConf = obj.guildConf;
+  var lang = obj.lang;
+
+  var arg = [handledArgs.other];
+  if(message.member.hasPermission("ADMINISTRATOR")) {
     if(arg[0] == undefined || isNaN(arg[0]) || Number(arg[0] - 1) > guildConf.roleAwards.length || Number(arg[0]) <= 0) {
       var string = `Which role would you like to remove? Please choose from the choices below and type \`${guildConf.prefix}removeRole (number)\` to remove that role.\n**Current role awards:**\n`
       if(guildConf.roleAwards.length < 1) {

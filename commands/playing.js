@@ -1,5 +1,8 @@
-module.exports = function(message, handledArgs, lang) {
-    var userArray = [];
+module.exports = function(obj) {
+    var message = obj.message;
+    var lang = obj.lang;
+    var handledArgs = obj.handledArgs;
+    
     var stringCount = 0;
     var realCount = 0;
     var string = "";

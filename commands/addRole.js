@@ -10,7 +10,11 @@ function getRole(string, guild) {
   return undefined;
 }
 
-module.exports = function(message, handledArgs, guildConf, lang) {
+module.exports = function(obj) {
+  var message = obj.message;
+  var handledArgs = obj.handledArgs;
+  var guildConf = obj.guildConf
+  var lang = obj.lang;
   if(message.member.hasPermission("ADMINISTRATOR")) {
       if(message.guild.me.hasPermission("MANAGE_ROLES") == false) {
         return message.reply(lang.commands.addRole.noPermission)

@@ -1,4 +1,7 @@
-module.exports = function(message, guildConf) {
+module.exports = function(obj) {
+  var message = obj.message;
+  var guildConf = obj.guildConf;
+  
   var string = ``
   var count = 0;
   for(i = 0; i < guildConf.roleAwards.length; i++) {  

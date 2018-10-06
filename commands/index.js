@@ -1,14 +1,19 @@
-// Playtime commands
-module.exports.timePlayed = require("./timePlayed.js")
-module.exports.topPlayed = require("./topPlayed.js")
-module.exports.playing = require("./playing.js")
-
-module.exports.botInfo = require("./botInfo.js")
-module.exports.status = require("./status.js")
-module.exports.removeGame = require("./removeGame.js")
-module.exports.setConfig = require("./setConfig.js")
-module.exports.showConfig = require("./showConfig.js")
-module.exports.addRole = require("./addRole.js")
-module.exports.removeRole = require("./removeRole.js")
-module.exports.showRoles = require("./showRoles.js")
-module.exports.setPrivacy = require("./setPrivacy.js")
+module.exports = {
+    botinfo: require("./botInfo.js"),
+    status: require("./status.js"),
+    removegame: require("./removeGame.js"),
+    setconfig: require("./setConfig.js"),
+    showconfig: require("./showConfig.js"),
+    addrole: require("./addRole.js"),
+    removerole: require("./removeRole.js"),
+    showroles: require("./showRoles.js"),
+    setprivacy: require("./setPrivacy.js"),
+    timeplayed: require("./timePlayed.js"),
+    topplayed: require("./topPlayed.js"),
+    playing: require("./playing.js"),
+    help: require("./help.js"),
+    erase: require("./erase.js"),
+    invite: require("./invite.js"),
+    lastPlayed: require("./lastPlayed.js"),
+    accept: require("./accept.js")
+}

@@ -1,6 +1,9 @@
 const tools = require("../tools");
 const Discord = require("discord.js")
-module.exports = function(message, client, lang) {
+module.exports = function(obj) {
+    var message = obj.message;
+    var lang = obj.lang;
+    var client = obj.client;
     const embed = new Discord.RichEmbed()
         .setAuthor(`Bot info`, ``)
         .setThumbnail(client.user.avatarURL)

@@ -1,9 +1,12 @@
 const tools = require("../tools");
 const Discord = require("discord.js")
 var connection = tools.getConnection;
-module.exports = function(message, client, id, mention, lang) {
-    var meantUser = message.author;
-    if(mention) meantUser = mention;
+module.exports = function(obj) {
+    var message = obj.message;
+    var client = obj.client;
+    var lang = obj.lang;
+    var meantUser = obj.meantUser;
+
     var presences = {
         dnd: ["do not disturb<:dnd:455385674749575168>", "#db2525"],
         idle: ["idle<:idle:455385674665951234>", "#e29b16"],
@@ -44,7 +47,7 @@ module.exports = function(message, client, id, mention, lang) {
     } else {
     embed.addField("Game playing", `${gameMessage} **${game}**`)
     }
-    lastOnline(id, meantUser.presence, function(string, date) {
+    lastOnline(meantUser.id, meantUser.presence, function(string, date) {
         if(meantUser.bot) game = undefined;
         tools.getThumbnail(game, function(thumbnail) {
             if(thumbnail && !embed.thumbnail) {

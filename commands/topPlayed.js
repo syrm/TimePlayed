@@ -1,15 +1,17 @@
 const tools = require("../tools");
 const Discord = require("discord.js")
-module.exports = function(message, handledArgs, id, mention, lang) {
-    var meantUser = message.author;
-    if(mention) meantUser = mention;
+module.exports = function(obj) {
+    var message = obj.message;
+    var handledArgs = obj.handledArgs;
+    var lang = obj.lang;
+    var meantUser = obj.meantUser;
+    
     message.channel.send('<a:loading:455383347921682433>').then(msg => {
-        tools.getStartDate(id, function(startDate) {
+        tools.getStartDate(meantUser.id, function(startDate) {
             var sinceWarning = false;
             if(handledArgs.since && tools.convert.sinceDate(handledArgs.since) < startDate) sinceWarning = true;
             if(handledArgs.other && !handledArgs.defaultGame) return msg.edit(lang.commands.topPlayed.noGame.replace("%arg%", handledArgs.other))
-            var customSince = tools.convert.sinceDate(handledArgs.since, true)
-            tools.topGames(id, handledArgs.since, function(topGames, totalMS) {
+            tools.topGames(meantUser.id, handledArgs.since, function(topGames, totalMS) {
                 if(topGames.length < 1 || topGames.every(e => e.time < 1)) {
                 if(handledArgs.since) {
                     return msg.edit(lang.commands.topPlayed.noGamePeriod)

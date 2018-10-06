@@ -192,20 +192,6 @@ client.on("message", message => {
         })
     }
 
-    if(message.content.startsWith("!!query") && message.author.id == "112237401681727488") {
-      return message.channel.send("<a:loading:455383347921682433> Executing query").then((msg) => {
-        connection.query(message.content.replace("!!query", ""), function(error, results, fields) {
-          if(error) {
-            msg.edit(`MySQL has returned an error:\n\`${error}\``);
-          } else {
-            msg.edit(`Here are your results:\n\`${JSON.stringify(results)}\``).catch(function(error) {
-                msg.edit(`Query results too long, can't send them here`);
-              })
-          }
-        })
-      })
-    }
-
     // Check if message is a command
     
     // Convert aliases to a regular command
@@ -302,14 +288,10 @@ client.on("message", message => {
 
     // Assign the right ID, and check for unsupported PM mentions
     var id = message.author.id
-    var meantUser = message.author
-    if(mention) {id = mention.id; meantUser = mention}
+    if(mention) {id = mention.id}
+
     if(PM && mention) return message.reply(lang.errors.noPMMention)
 
-    // Define the standard sinces
-    var defaultSinces = ['7d', 'today', undefined]
-    var game = handledArgs.other
-    var customSince = handledArgs.since
     // Execute the private check (async)
     tools.termsCheck(message.author.id, mentionID, guildID, function(results) {
       accept = results[0]
@@ -339,174 +321,20 @@ client.on("message", message => {
     
         // Get the start date of the user
         tools.getStartDate(id, function(startDate) {
-          
           lang = tools.replaceLang(/%startDateString%+/g, tools.convert.timeDifference(startDate, new Date(), true), lang)
-            if(command === "servertop") {
-              
-            }
-            if(command === "topplayed") {
-              execute.topPlayed(message, handledArgs, id, mention, lang);
-            }
-            if(command === "timeplayed") {
-              execute.timePlayed(message, handledArgs, id, mention, lang);
-            }
-            if(command === "lastplayed") {
-              tools.lastPlayed(id, handledArgs.other, function(result) {
-                if(result == -1) return msg.edit(lang.commands.timePlayed.noPlaytime)
-                if(meantUser.presence.game && meantUser.presence.game.name.toLowerCase() == handledArgs.other.toLowerCase()) return msg.edit(lang.commands.lastPlayed.rightNow)
-                return msg.edit(lang.commands.lastPlayed.message.replace("%result%", tools.convert.timeDifference(result)))
-              })
-            }
 
-            if(command === "help")  {
-              if(handledArgs.defaultGame) {
-                var categories = {}
-                Object.keys(lang.commands).forEach((commandName, index) => {
-                  var commandObj = lang.commands[commandName]
-                  if(!PM) {
-                    if(!categories[commandObj.category]) categories[commandObj.category] = []
-                    categories[commandObj.category].push({command: commandName, description: commandObj.helpDescription, args: commandObj.args})
-                  } else if(commandObj.PMSupport) {
-                    if(!categories[commandObj.category]) categories[commandObj.category] = []
-                    categories[commandObj.category].push({command: commandName, description: commandObj.helpDescription, args: commandObj.args.replace("[@user]", "")})
-                  }
-                })
-                const embed = new Discord.RichEmbed()
-                .setAuthor(lang.commands.help.title, client.user.avatarURL)
-                .setColor(lang.colors.lightGreen)
-                if(PM) embed.setDescription(lang.commands.help.PMDescription)
-                if(!PM) embed.setDescription(lang.commands.help.description)
-                Object.keys(categories).forEach(category => {
-                  var commands = categories[category]
-                  var str = ""
-                  commands.forEach(command => {
-                    str += `**${guildConf.prefix}${command.command}** ${command.args} - ${command.description}\n`
-                  })
-                  embed.addField(category, str)
-                })
-                embed.addField(lang.commands.help.linksTitle, lang.commands.help.links)
-                message.channel.send({embed})
-              } else {
-                var description;
-                var aliases;
-                var commandWithUpper;
-                var syntax;
-                Object.keys(lang.commands).forEach(commandName => {
-                  if(handledArgs.other == commandName.toLowerCase() || handledArgs.other.replace(guildConf.prefix, "").toLowerCase() == commandName.toLowerCase() || handledArgs.other.replace("!!", "").toLowerCase() == commandName.toLowerCase()) {
-                    var commandObj = lang.commands[commandName]
-                    description = commandObj.fullDescription;
-                    syntax = commandObj.args;
-                    commandUpper = commandName;
-                    aliases = commandObj.aliases
-                  }
-                })
-                var aliasesString;
-                if(aliases && aliases.length > 0) {
-                  var is = "is"
-                  var es = ""
-                  if(aliases.length > 1) {
-                    is = "are"
-                    es = "es"
-                  } 
-                  var aliasesString = `The ${aliases.length} alias${es} for this command ${is}: `
-                  aliases.forEach((alias, i) => {
-                    var last = i == aliases.length - 1
-                    if(i == 0) {
-                      aliasesString += `\`${guildConf.prefix}${alias}\``
-                    } else if(last) {
-                      aliasesString += ` and \`${guildConf.prefix}${alias}\``
-                    } else {
-                      aliasesString += `, \`${guildConf.prefix}${alias}\``
-                    }
-                  })
-                } else {
-                  aliasesString = `This command has no aliases!`
-                }
-                
-                if(!description) return message.reply(lang.errors.helpCommandNotFound)
-    
-                const embed = new Discord.RichEmbed()
-                .setAuthor("Command info")
-                .setDescription(lang.commands.help.fullDescriptionDescription.replace("%command%", commandUpper))
-                .setColor(lang.colors.lightGreen)
-                .addField(`Aliases`, aliasesString)
-                .addField(`Syntax`, lang.commands.help.syntax.replace("%syntax%", `${guildConf.prefix}${commandUpper} ${syntax}`))
-                .addField(`Full description`, description)
-                message.channel.send({embed})
-              }
+            // Currently disabled command: !!serverTop
+            var meantUser = message.author;
+            if(mention) meantUser = mention;
+            var info = {
+              message: message,
+              client: client,
+              handledArgs: handledArgs,
+              guildConf: guildConf,
+              lang: lang,
+              meantUser: meantUser
             }
-    
-            if(command === "playing") {
-              execute.playing(message, handledArgs, lang);
-            }
-    
-            if(command === "botinfo") {
-              execute.botInfo(message, client, lang);
-            }
-    
-            if(command === "invite") {
-              message.channel.send(lang.commands.invite.msg)
-            }
-    
-            if(command === "status") {
-              execute.status(message, client, id, mention, lang);
-            }
-    
-            if(command === "removegame") {
-              if(handledArgs.defaultGame) return wrongSyntax(message, command, lang)
-              execute.removeGame(message, handledArgs)
-            }
-    
-            if(command === "setprivacy") {
-              execute.setPrivacy(message, lang)
-            }
-            
-            if(command === "accept") {
-              tools.setTerms(message.author.id, true, function() {
-                return message.reply(lang.general.termsAccepted)
-              })
-            }
-    
-            if(command === "erase") {
-              message.reply(lang.commands.erase.confirmation).then(msg => {
-                tools.awaitReaction(msg, ["✅"], message.author.id, function() {
-                  message.channel.send("<a:loading:455383347921682433> Deleting your playtime data...").then(loadingMSG => {
-                    tools.setTerms(message.author.id, false, function() {
-                      connection.query(`DELETE FROM playtime WHERE userID=${message.author.id}`, function(error, results, fields) {
-                        loadingMSG.edit("<a:loading:455383347921682433> Deleting your last online data...")
-                        connection.query(`DELETE FROM lastOnline WHERE userID=${message.author.id}`, function(error, results, fields) {
-                          loadingMSG.edit("<a:loading:455383347921682433> Deleting your start date...")
-                          connection.query(`DELETE FROM startDates WHERE userID=${message.author.id}`, function(error, results, fields) {
-                            loadingMSG.edit("Done! All your data is now completely erased.")
-                          })
-                        })
-                      })
-                    })
-                  })
-                })
-              })
-            }
-    
-            if(command === "setconfig") {
-              execute.setConfig(message, handledArgs, lang)
-            }
-    
-            if(command === "showconfig") {
-              execute.showConfig(message, guildConf, lang)
-            }
-    
-            if(command === "addrole") {
-              execute.addRole(message, handledArgs, guildConf, lang)
-            }
-    
-            if(command === "removerole") {
-              execute.removeRole(message, handledArgs, guildConf, lang)
-            }
-    
-            if(command === "showroles") {
-              execute.showRoles(message, guildConf)
-            }
-          
+            execute[command].call(undefined, info);
         })
       })
       

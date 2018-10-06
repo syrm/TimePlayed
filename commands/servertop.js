@@ -1,4 +1,4 @@
-const tools = require("../tools");
+/* const tools = require("../tools");
 const Discord = require("discord.js")
 var connection = tools.getConnection;
 module.exports = function() {
@@ -49,4 +49,4 @@ module.exports = function() {
       return msg.edit(lang.errors.noLeaderboardFile)
     }
   })
-}
+} */
