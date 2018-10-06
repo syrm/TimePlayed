@@ -10,6 +10,8 @@ module.exports = function(obj) {
 
   message.channel.send('<a:loading:455383347921682433>').then(msg => {
     tools.getStartDate(meantUser.id, function(startDate) {
+      var sinceWarning = false;
+      if(handledArgs.since && tools.convert.sinceDate(handledArgs.since) < startDate) sinceWarning = true;
       connection.query("SELECT game FROM playtime WHERE userID=? AND soundex(game) = soundex(?)", [meantUser.id, handledArgs.other], function(error, correctedGames, fields) {
         if(correctedGames.length < 1) return msg.edit(lang.commands.timePlayed.noPlaytime.replace("%game%", handledArgs.other) + lang.warnings.realityWarning)
         var correctedGame = correctedGames[0].game
