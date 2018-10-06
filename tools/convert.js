@@ -16,18 +16,22 @@ module.exports.timeToString =  function(num) {
   var s = ""
   if(seconds == 1) s = "1 second"
   if(seconds > 1) s = `${seconds} seconds`
-  var and = ""
-  if(seconds > 0) {
-    if(minutes > 0 || hours > 0) and = " and "
-  }
-  var comma = ""
-  if(hours > 0) comma = ", "
-  if(seconds < 1 && hours > 0) comma = " and "
-  
-  return h + comma +  m + and + s
 
+  var comma1 = "";
+  if(hours > 0 && minutes > 0) comma1 = ", "
+  var comma2 = "";
+  if(minutes > 0 && seconds > 0) comma2 = ", "
+  if(hours > 0 && seconds > 0) comma2 = ", "
+
+  var str = h + comma1 +  m + comma2 + s
+  var pos = str.lastIndexOf(',');
+  if(pos > 0) {
+    str = str.substring(0,pos) + " and" + str.substring(pos+1)
+  }
+  
+  return str
 }
-module.exports.sinceDate = function(since, strict) {
+module.exports.sinceDate = function(since) {
   if(since instanceof Date) return since;
   if(!isNaN(since)) {
     var d = new Date();
