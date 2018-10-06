@@ -4,7 +4,7 @@ module.exports = function(userID, guildID, choice, callback) {
   if(choice == 2) num = 1
   var global = true;
   if(choice == 0) global = false;
-  connection.query(`SELECT * FROM privacy WHERE userID=${userID}`, function(error, results, fields) {
+  connection.query(`SELECT * FROM privateUsers WHERE userID=${userID}`, function(error, results, fields) {
     var already;
     // 0 is private, 1 is public
     results.forEach(result => {
@@ -27,7 +27,7 @@ module.exports = function(userID, guildID, choice, callback) {
       return callback()
     }
     if(choice == 2) {
-      connection.query(`DELETE FROM privacy WHERE userID=${userID}`, function(error, results, fields) {
+      connection.query(`DELETE FROM privateUsers WHERE userID=${userID}`, function(error, results, fields) {
         return callback()
       })
     }
@@ -36,15 +36,14 @@ module.exports = function(userID, guildID, choice, callback) {
       var guild = ""
       var guildValue = ""
       if(!global) {guild = ", guildID"; guildValue = `, ${guildID}`}
-      console.log(`INSERT INTO privacy (userID, value${guild}) VALUES (${userID}, ${num}${guildValue})`)
-      connection.query(`INSERT INTO privacy (userID, value${guild}) VALUES (${userID}, ${num}${guildValue})`, function(error, results, fields) {
+      connection.query(`INSERT INTO privateUsers (userID, value${guild}) VALUES (${userID}, ${num}${guildValue})`, function(error, results, fields) {
         return callback()
       })
     }
     if(already == false && choice != 2) {
       var guildIDStatement = " IS NULL"
       if(!global) guildIDStatement = `=${guildID}`
-      connection.query(`UPDATE privacy SET value=${num} WHERE userID=${userID} AND guildID${guildIDStatement}`, function(error, results, fields) {
+      connection.query(`UPDATE privateUsers SET value=${num} WHERE userID=${userID} AND guildID${guildIDStatement}`, function(error, results, fields) {
         return callback()
       })
     }
