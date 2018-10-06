@@ -1,6 +1,9 @@
 // Categories
 exports.convert = require('./convert.js')
 
+// Connectoin
+exports.getConnection = require('./connection.js')
+
 // Individual functions
 exports.timePlayed = require('./timePlayed.js')
 exports.bulkTimeplayed = require('./bulkTimeplayed.js')
@@ -17,5 +20,7 @@ exports.setTerms = require('./setTerms.js')
 exports.lastPlayed = require('./lastPlayed.js')
 exports.filterTerms = require('./filterTerms.js')
 
-//exports.setTerms2 = require('./setTerms2.js') // Alleen beta.js
-//exports.topGames2 = require('./topGames2.js')
+exports.replaceLang = require('./replaceLang.js')
+exports.acceptCollector = require('./acceptCollector.js')
+exports.getThumbnail = require('./getThumbnail.js')
+exports.awaitReaction = require('./awaitReaction.js')
