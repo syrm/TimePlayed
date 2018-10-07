@@ -48,19 +48,19 @@ module.exports.secondsToTime = function(num, simple) {
   if(!simple) itl = "In the last ";
 
   if(w > 0) {
-    return `${itl}${w > 1 ? w + " " : ""}week${w > 1 ? "s" : ""}`
+    return `${itl}${w} week${w > 1 ? "s" : ""}`
   }
   if(d > 0) {
-    return `${itl}${d > 1 ? d + " " : ""}day${d > 1 ? "s" : ""}`
+    return `${itl}${d} day${d > 1 ? "s" : ""}`
   }
   if(h > 0) {
-    return `${itl}${h > 1 ? h + " " : ""}hour${h > 1 ? "s" : ""}`
+    return `${itl}${h} hour${h > 1 ? "s" : ""}`
   }
   if(m > 0) {
-    return `${itl}${m > 1 ? m + " " : ""}minute${m > 1 ? "s" : ""}`
+    return `${itl}${m} minute${m > 1 ? "s" : ""}`
   }
   if(s > 0) {
-    return `${itl}${s > 1 ? s + " " : ""}second${s > 1 ? "s" : ""}`
+    return `${itl}${s} second${s > 1 ? "s" : ""}`
   }
 }
 
