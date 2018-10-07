@@ -30,7 +30,7 @@ module.exports =  function(id, game, sinces, callback) {
           }
           if(diffMS > 0) msCount += diffMS
         })
-        results[sinceString] = Math.floor(msCount)
+        results[sinceString] = Math.floor(msCount / 1000)
       })
       return callback(results)
     });

@@ -47,7 +47,6 @@ module.exports =  function(guilds, callback) {
       })
       finalResults.push({guildID: guild.guildID, game: guild.game, since: guild.since, results: guildResults})
     })
-    connection.release();
     return callback(finalResults)
   });
 }

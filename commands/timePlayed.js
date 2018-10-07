@@ -34,7 +34,7 @@ module.exports = function(obj) {
             lang = tools.replaceLang(`%timePlayed${since[1]}%`, tools.convert.timeToString(results[since[0]]), lang)
           })
           if(handledArgs.since) {
-            var string = lang.commands.timePlayed.customSince.replace("%customSince%", tools.convert.sinceToString(handledArgs.since))
+            var string = lang.commands.timePlayed.customSince.replace("%customSince%", tools.convert.secondsToTime(tools.convert.stringToSeconds(handledArgs.since)))
             if(sinceWarning == true) {
               string += lang.warnings.sinceWarning
             }

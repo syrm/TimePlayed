@@ -13,11 +13,11 @@ module.exports = function(obj) {
             if(handledArgs.other && !handledArgs.defaultGame) return msg.edit(lang.commands.topPlayed.noGame.replace("%arg%", handledArgs.other))
             tools.topGames(meantUser.id, handledArgs.since, function(topGames, totalMS) {
                 if(topGames.length < 1 || topGames.every(e => e.time < 1)) {
-                if(handledArgs.since) {
-                    return msg.edit(lang.commands.topPlayed.noGamePeriod)
-                } else {
-                    return msg.edit(lang.commands.topPlayed.noGameEver)
-                }
+                    if(handledArgs.since) {
+                        return msg.edit(lang.commands.topPlayed.noGamePeriod)
+                    } else {
+                        return msg.edit(lang.commands.topPlayed.noGameEver)
+                    }
                 }
                 const embed = new Discord.RichEmbed()
                 .setColor("#33f76b")
@@ -33,14 +33,14 @@ module.exports = function(obj) {
                 if(hours < 1) hours = "< 1"
                 lang = tools.replaceLang("%hours%", hours, lang)
                 if(handledArgs.since) {
-                    embed.setTitle(lang.commands.topPlayed.titleCustomSince2.replace("%customSince%", tools.convert.sinceToString(handledArgs.since)), meantUser.avatarURL)
+                    embed.setTitle(lang.commands.topPlayed.titleCustomSince2.replace("%customSince%", tools.convert.secondsToTime(tools.convert.stringToSeconds(handledArgs.since))), meantUser.avatarURL)
                 } else {
                     embed.setTitle(lang.commands.topPlayed.title2, meantUser.avatarURL)
                 }
                 for(var i = 0; i < 10; i++) {
-                if(topGames[i] && topGames[i].time / 1000 > 0) {
-                    embed.addField(`${i + 1}. ${topGames[i].game}`, tools.convert.timeToString(topGames[i].time))
-                }
+                    if(topGames[i] && topGames[i].time / 1000 > 0) {
+                        embed.addField(`${i + 1}. ${topGames[i].game}`, tools.convert.timeToString(topGames[i].time))
+                    }
                 }
                 return msg.edit(embed)
             })

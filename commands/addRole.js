@@ -5,7 +5,7 @@ function getRole(string, guild) {
   if(string == undefined) return undefined;
   var roleID = string.replace("<@", "").replace(">", "");
   if(guild.roles.get(roleID) != undefined) return message.guild.roles.get(roleID);
-  if(guild.roles.find("name", string) != undefined) return guild.roles.find("name", string);
+  if(guild.roles.find(e => e.name == string) != undefined) return guild.roles.find(e => e.name == string);
   // If nothing was found, return undefined
   return undefined;
 }
@@ -31,19 +31,19 @@ module.exports = function(obj) {
       if(role.position >= highestBotRole.position) return message.reply(lang.commands.addRole.roleTooHigh)
 
       // Check if award with the same role already exist
-      var obj = {game: handledArgs.game, time: handledArgs.since.split("/")[0], per: handledArgs.since.split("/")[1], roleID: role.id}
-      var same;
-      guildConf.roleAwards.forEach(role => {
-        if(role.roleID == obj.roleID) {
-          same = true;
-        }
-      })
-      if(same == true) return message.reply(lang.commands.addRole.alreadyAssigned)
-      guildConf.roleAwards.push(obj)
-      connection.query("UPDATE guildSettings SET roleAwards=?", [JSON.stringify(guildConf.roleAwards)], function(error, results, fields) {
-        var str = lang.commands.addRole.success.replace("%role%", role).replace("%neededTime%", tools.convert.sinceToString(handledArgs.since.split("/")[0], true, true)).replace("%timePeriod%", tools.convert.sinceToString(handledArgs.since.split("/")[1], true))
-        if(handledArgs.defaultGame) str += lang.commands.addRole.defaultGameNote
-        return message.channel.send(str)
+      connection.query("SELECT roleID FROM roleAwards WHERE guildID=? AND roleID=?", [message.guild.id, role.id], function(error, results, fields) {
+        var same = false;
+        if(results.length > 0) same = true;
+        if(same) return message.reply(lang.commands.addRole.alreadyAssigned)
+
+        // Insert the award
+        var timeSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[0])
+        var perSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[1])
+        connection.query("INSERT INTO roleAwards (guildID, game, time, per, roleID) VALUES (?, ?, ?, ?, ?)", [message.guild.id, handledArgs.game, timeSeconds, perSeconds, role.id], function(error, results, fields) {
+          var str = lang.commands.addRole.success.replace("%role%", role).replace("%neededTime%", tools.convert.secondsToTime(timeSeconds, true)).replace("%timePeriod%", tools.convert.secondsToTime(perSeconds, true))
+          if(handledArgs.defaultGame) str += lang.commands.addRole.defaultGameNote
+          return message.channel.send(str)
+        })
       })
     } else {
       return message.reply(lang.errors.noPermission)

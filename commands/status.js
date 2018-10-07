@@ -32,7 +32,9 @@ module.exports = function(obj) {
     if(presence.status != "offline") return callback("Right Now")
         connection.query(`SELECT * FROM lastOnline WHERE userID=${id}`, function(error, results, fields) {
         if(!results[0]) return callback("Not measured / Online since I got here", undefined);
-        return callback(tools.convert.firstLetterUp(tools.convert.timeDifference(results[0].date, new Date())) + " (see footer for excact timestamp)", results[0].date)
+        var str = tools.convert.timeDifference(results[0].date, new Date())
+        str = str.charAt(0).toUpperCase() + str.slice(1)
+        return callback(str + " (see footer for excact timestamp)", results[0].date)
         })
     }
 

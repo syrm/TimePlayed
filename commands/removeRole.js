@@ -8,28 +8,32 @@ module.exports = function(obj) {
 
   var arg = [handledArgs.other];
   if(message.member.hasPermission("ADMINISTRATOR")) {
-    if(arg[0] == undefined || isNaN(arg[0]) || Number(arg[0] - 1) > guildConf.roleAwards.length || Number(arg[0]) <= 0) {
-      var string = `Which role would you like to remove? Please choose from the choices below and type \`${guildConf.prefix}removeRole (number)\` to remove that role.\n**Current role awards:**\n`
-      if(guildConf.roleAwards.length < 1) {
-        return message.reply(`This server doesn't have any role awards, so there's nothing to remove!`)
-      }
-      for(i = 0; i < guildConf.roleAwards.length; i++) {
-        var role = message.guild.roles.get(guildConf.roleAwards[i].roleID)
-        if(role) {
-          string += `**${i + 1}:** Game: \`${guildConf.roleAwards[i].game}\`, time needed: \`${tools.convert.sinceToString(guildConf.roleAwards[i].time, true, true)}/${tools.convert.sinceToString(guildConf.roleAwards[i].per, true)}\`, awarded role: ${role}\n`
-        } else {
-          string += `**${i + 1}:** \`(deleted role, please remove)\`\n`
+    connection.query("SELECT * FROM roleAwards WHERE guildID=?", [message.guild.id], function(error, results, fields) {
+      if(arg[0] == undefined || isNaN(arg[0]) || Number(arg[0] - 1) > results.length || Number(arg[0]) <= 0) {
+        var string = `Which role would you like to remove? Please choose from the choices below and type \`${guildConf.prefix}removeRole (number)\` to remove that role.\n**Current role awards:**\n`
+        if(results.length < 1) {
+          return message.reply(`This server doesn't have any role awards, so there's nothing to remove!`)
         }
+        results.forEach((award, i) => {
+          var role = message.guild.roles.get(award.roleID)
+          if(role) {
+            string += `**${i + 1}:** Game: \`${award.game}\`, time needed: \`${tools.convert.secondsToTime(award.time, true)}/${tools.convert.secondsToTime(award.per, true)}\`, awarded role: ${role}\n`
+          } else {
+            string += `**${i + 1}:** \`(deleted role, please remove this award)\`\n`
+          }
+        })
+        return message.reply(string)
+      } else {
+        var roleIndex = Number(arg[0] - 1)
+        var roleObj = results[roleIndex]
+        var roleMention = message.guild.roles.get(roleObj.roleID)
+        if(!roleMention) roleMention = "(deleted role)"
+        connection.query("DELETE FROM roleAwards WHERE roleID=?", [roleObj.roleID], function(error, results, fields) {
+          return message.reply(`Succesfully removed the ${roleMention} role award when playing more than \`${tools.convert.secondsToTime(roleObj.time, true)}/${tools.convert.secondsToTime(roleObj.per, true)}\` \`${roleObj.game}\``)
+        })
       }
-      return message.reply(string)
-    } else {
-      var role = guildConf.roleAwards[Number(arg[0] - 1)]
-      var roleMention = message.guild.roles.get(role.roleID)
-      guildConf.roleAwards.splice(Number(arg[0]) - 1, 1)
-      connection.query("UPDATE guildSettings SET roleAwards=?", [JSON.stringify(guildConf.roleAwards)], function(error, results, fields) {
-        return message.reply(`Succesfully removed the ${roleMention} role award when playing more than \`${tools.convert.sinceToString(role.time, true, true)}/${tools.convert.sinceToString(role.per, true)}\` \`${role.game}\``)
-      })
-    }
+    })
+    
   } else {
     return message.reply(lang.errors.noPermission)
   }

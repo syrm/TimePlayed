@@ -3,8 +3,8 @@ const token = keys.botToken;
 const Discord = require("discord.js");
 const fs = require('fs')
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true});
-
 const tools = require('./tools')
+var connection = tools.getConnection
 
 // LEADERBOARD
 
@@ -213,94 +213,69 @@ function updateRoles() {
   console.log("Checking for role awards...")
   var guilds = [];
   console.time("Updating role awards took");
-  tools.getGuildConfigs(function(configs) {
+  connection.query("SELECT * FROM roleAwards", function(error, allAwards, fields) {
     client.guilds.forEach(guild => {
-      var i = configs.map(e => {return e.guildID}).indexOf(guild.id)
-      if(i < 0) return;
-      var guildConf = configs[i].config;
-      if(guildConf.roleAwards.length > 0) {
-        guildConf.roleAwards.forEach(award => {
-          if(guilds.some(e => e.guildID == guild.id && e.game == award.game && e.since == award.per) == false) {
-            // If the guild, same game and since isn't already in the list, push to guilds
-            var idList = []
-            guild.members.forEach(member => {
-              idList.push(member.id)
-            })
-            guilds.push({guildID: guild.id, game: award.game, since: award.per, ids: idList})
-          }
-        })
-      }
+      var awards = allAwards.filter(e => e.guildID == guild.id)
+      awards.forEach(award => {
+        if(guilds.some(e => e.guildID == guild.id && e.game == award.game && e.since == award.per) == false) {
+          // If the guild, same game and since isn't already in the list, push to guilds
+          var idList = []
+          guild.members.forEach(member => {
+            idList.push(member.id)
+          })
+          guilds.push({guildID: guild.id, game: award.game, since: award.per, ids: idList})
+        }
+      })
     })
     tools.bulkTimeplayedCustomSince(guilds, function(results) {
       var addCount = 0
       var removeCount = 0
       client.guilds.forEach(guild => {
-        var i = configs.map(e => {return e.guildID}).indexOf(guild.id)
-        if(i < 0) return;
-        var guildConf = configs[i].config;
-        if(guildConf.roleAwards.length > 0) {
-          guildConf.roleAwards.forEach(award => {
-            var foundIndex;
-            results.forEach(function(result, index) {
-              if(result.guildID == guild.id && result.game == award.game && result.since == award.per) {
-                foundIndex = index;
-              }
-            })
-            if(foundIndex != undefined) {
-              guild.members.forEach(member => {
-                var index = results[foundIndex].results.map(e => {return e.id}).indexOf(member.id)
-                var userResult = results[foundIndex].results[index]
-                var role = guild.roles.get(award.roleID)
-                var highestBotRole = guild.me.roles.sort(function(a, b) {
-                  return a.position < b.position
-                }).first()
-                if(index != -1 && role != undefined) {
-                  if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
-                  if(member.roles.get(award.roleID)) {
-                    if(userResult.minutes * 60000 < Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
-                      // Remove role/send message
-                      member.removeRole(role)
-                      .catch(err => console.log(err))
-                      removeCount++
-                      console.log(`Removed ${member.displayName} from the ${role.name} role.`)
-                    }
-                  } else {
-                    if(userResult.minutes * 60000 > Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
-                      // Add role/send message
-                      member.addRole(role)
-                      .catch(err => console.log(err))
-                      addCount++
-                      console.log(`Added ${member.displayName} to the ${role.name} role.`)
-                    }
-                  }
-                }
-              })
+        var awards = allAwards.filter(e => e.guildID == guild.id)
+        awards.forEach(award => {
+          var foundIndex;
+          results.forEach(function(result, index) {
+            if(result.guildID == guild.id && result.game == award.game && result.since == award.per) {
+              foundIndex = index;
             }
           })
-        }
-        /* if(guild.id == "483339338600415243") {
-          console.log("Special guild")
-          guild.members.forEach(member => {
-            var highest;
-            member.roles.forEach(role => {
-              var roleAward = guildConf.roleAwards[guildConf.roleAwards.map(e => {return e.roleID}).indexOf(role.id)]
-              if(!roleAward) return;
-              if(!highest || tools.convert.sinceDate(roleAward.time) < tools.convert.sinceDate(highest.time)) highest = roleAward;
+          if(foundIndex != undefined) {
+            guild.members.forEach(member => {
+              var index = results[foundIndex].results.map(e => {return e.id}).indexOf(member.id)
+              var userResult = results[foundIndex].results[index]
+              var role = guild.roles.get(award.roleID)
+              var highestBotRole = guild.me.roles.sort(function(a, b) {
+                return a.position < b.position
+              }).first()
+              if(index != -1 && role != undefined) {
+                if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
+                if(member.roles.get(award.roleID)) {
+                  if(userResult.minutes * 60000 < Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
+                    // Remove role/send message
+                    member.removeRole(role)
+                    .catch(err => console.log(err))
+                    removeCount++
+                    console.log(`Removed ${member.displayName} from the ${role.name} role.`)
+                  }
+                } else {
+                  if(userResult.minutes * 60000 > Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
+                    // Add role/send message
+                    member.addRole(role)
+                    .catch(err => console.log(err))
+                    addCount++
+                    console.log(`Added ${member.displayName} to the ${role.name} role.`)
+                  }
+                }
+              }
             })
-            console.log(`Highest role time: ${highest.time}`)
-            member.roles.forEach(role => {
-              var validRoles = guildConf.roleAwards.map(e => {return e.roleID})
-              if(!validRoles.includes(role.id) || role.id == highest.roleID) return;
-              console.log(`Removed from role ${role.name}`)
-              member.removeRole(role).catch(err => console.log(err))
-            })
-          })
-        } */
+          }
+        })
       })
       console.timeEnd("Updating role awards took");
       console.log(`Done! Removed ${removeCount} member(s) from roles/added ${addCount} member(s) to roles`)
     })
-  }, true)
+  })
+    
 }
 
 client.on("ready", () => {

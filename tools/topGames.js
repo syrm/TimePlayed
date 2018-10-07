@@ -28,9 +28,9 @@ module.exports = function(id, since, callback) {
         totalMS += diffMS;
         if(games.some(e => e.game == result.game)) {
             var index = games.map(e => {return e.game}).indexOf(result.game);
-            games[index].time += diffMS;
+            games[index].time += Math.floor(diffMS / 1000);
         } else {
-            games.push({game: result.game, time: diffMS})
+            games.push({game: result.game, time: Math.floor(diffMS / 1000)})
         }
       })
       games.sort(function(a, b){return b.time-a.time});
