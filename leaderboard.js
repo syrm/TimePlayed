@@ -281,7 +281,7 @@ function updateRoles() {
 client.on("ready", () => {
   console.log("Ready!")
   updateRoles()
-  setInterval(updateRoles, 300000)
+  setInterval(updateRoles, 60000);
   /* updateRankingChannel(function() {
     setInterval(updateRankingChannel, 180000);
     updateRoles()
