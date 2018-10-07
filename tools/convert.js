@@ -78,6 +78,9 @@ module.exports.sinceDate = function(since) {
   if(since == "all" || since == "always" || since == "total" || typeof since != "string") {
     return new Date("January 01, 1970 00:00:00");
   }
+  if(["m", "h", "d", "w"].includes(since)) {
+    since = "1" + since;
+  }
   if(since == "today" || since == "day") {
     d.setHours(6);
     d.setMinutes(0);
