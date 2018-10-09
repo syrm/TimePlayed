@@ -10,7 +10,7 @@ function requestIcon(game, client) {
             }
         })
         if(error) return;
-        connection.query(`INSERT INTO gameIcons (game, userID) VALUES (?, ?)`, [game, requesterID], function(error, results, fields) {
+        connection.query(`INSERT INTO gameIcons (game) VALUES (?)`, [game], function(error, results, fields) {
             client.channels.get("475001642870374410").send(`Icon requested, status: awaiting response\nGame name: \`${game}\`\nRequested by: \`"Client (automated request)"\`\nType \`!assign ${results.insertId} (iconURL)\` to approve, or \`!delete ${results.insertId}\` to delete/ignore.`).then(msg => {
                 connection.query("UPDATE gameIcons SET messageID=? WHERE ID=?", [msg.id, results.insertId], function(error, results, fields) {
                     return;
