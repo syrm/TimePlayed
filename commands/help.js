@@ -6,6 +6,9 @@ module.exports = function(obj) {
   var client = obj.client;
   var guildConf = obj.guildConf;
   var PM = message.channel.type == "dm"
+  if(PM) {
+    guildConf.prefix = "!!";
+  }
   
   if(handledArgs.defaultGame) {
       var categories = {}
