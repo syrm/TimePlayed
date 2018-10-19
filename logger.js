@@ -37,6 +37,7 @@ function refresh() {
 }
 
 function startLogging() {
+  console.log("Starting the logging!")
   refresh()
   setInterval(refresh, 5000)
 }
@@ -46,7 +47,6 @@ function dataReady() {
     startLogging();
   } else {
     client.on("ready", () => {
-      console.log("Ready!")
       startLogging();
     });
   }
