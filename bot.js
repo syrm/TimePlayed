@@ -292,10 +292,11 @@ client.on("message", message => {
     if(PM && mention) return message.reply(lang.errors.noPMMention)
 
     // Execute the private check (async)
-    tools.termsCheck(message.author.id, mentionID, guildID, function(results) {
+    tools.termsCheck(message.author.id, id, guildID, function(results) {
       accept = results[0]
       premium = results[1]
-      tools.privateCheck(mentionID, guildID, function(private) {
+      connection.query(`SELECT count(*) FROM privateUsers WHERE userID=?`, [id], function(error, results, fields) {
+        var private = results[0]["count(*)"] > 0;
         var termsMSG;
         if(accept.executer == undefined && command != "accept") termsMSG = lang.errors.firstTime;
         if(accept.executer == false && command != "accept") termsMSG = lang.errors.stillAccept;
