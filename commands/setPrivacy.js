@@ -1,5 +1,5 @@
 var tools = require("../tools")
-var connection = tools.getConnection()
+var connection = tools.getConnection
 module.exports = function(obj) {
   var message = obj.message;
   var lang = obj.lang;
