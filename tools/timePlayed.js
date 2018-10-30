@@ -6,7 +6,7 @@ module.exports =  function(id, game, sinces, callback) {
     return callback()
   }
   connection.query("SET CHARACTER SET utf8mb4", function(error, results, fields) {
-    connection.query(`SELECT game, startDate, endDate FROM playtime WHERE userID=${id} AND game=?`, [game], function(error, permResults, fields) {
+    connection.query(`SELECT game, startDate, endDate FROM playtime WHERE userID=? AND game=?`, [id, game], function(error, permResults, fields) {
       var results = [];
       sinces.forEach(sinceString => {
         var msCount = 0;

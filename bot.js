@@ -1,16 +1,9 @@
 // Made by xVaql#4581, all rights reserved
 const keys = require('./keys.json');
-var beta;
-if(keys.beta) {
-  beta = true
-} else {
-  beta = false
-}
-
+var beta = keys.beta;
 
 var token = keys.botToken
 const key = keys.imageAPIKeys;
-var realityWarning = `Please realize that this information is **based on Discord presences** and it can deviate from reality.`
 
 // Require everything
 const Discord = require("discord.js")
