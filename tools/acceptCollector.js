@@ -1,5 +1,5 @@
 module.exports = function(acceptMessage) {
-    const filter = (reaction, user) => reaction.emoji.toString() == "✅" && reaction.message.content.startsWith("​​​​") && reaction.message.author.id == client.user.id && user.id != client.user.id
+    const filter = (reaction, user) => reaction.emoji.toString() == "✅" && reaction.message.content.startsWith("​​​​") && reaction.message.author.id == "433625399398891541" && user.id != "433625399398891541"
     const collector = acceptMessage.createReactionCollector(filter);
     collector.on('collect', (reaction, user) => {
       user = reaction.users.last()
