@@ -14,24 +14,22 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
-/* console.log("Clearing up invalid dates...");
+console.log("Clearing up invalid dates...");
 connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
   if(error) throw error;
   console.log("Clearup done");
   dataReady();
-}) */
+})
 
 var toCheck = []
-var ready = false;
 
 function refresh() {
   console.log("Refreshing...")
   tools.filterTerms(toCheck, function(accepted) {
-    /* accepted.forEach(arr => {
+    accepted.forEach(arr => {
       lastOnline(arr[0], arr[1], arr[2])
       gameUpdate(arr[0], arr[1], arr[2], arr[3])
-    }) */
-    console.log(accepted);
+    })
     console.log(`Done, ${accepted.length} of the ${toCheck.length} accepted`)
     toCheck = []
   })
@@ -40,54 +38,48 @@ function refresh() {
 
 function lastOnline(oldMember, newMember, date) {
   if(oldMember.presence.status == newMember.presence.status || newMember.presence.status != "offline") return;
-  connection.query(`SELECT * FROM lastOnline WHERE userID=${oldMember.id}`, function(error, results, fields) {
+  connection.query(`SELECT * FROM lastOnline WHERE userID=?`, [oldMember.id], function(error, results, fields) {
     if(error) throw error;
     if(results.length < 1) {
-      connection.query(`INSERT INTO lastOnline (userID, date) VALUES (${oldMember.id}, ${connection.escape(date)})`, function(error, results, fields) {
+      connection.query(`INSERT INTO lastOnline (userID, date) VALUES (?, ?)`, [oldMember.id, date], function(error, results, fields) {
         if(error) throw error;
       })
     } else {
-      connection.query(`UPDATE lastOnline SET date=${connection.escape(date)} WHERE userID=${oldMember.id}`, function(error, results, fields) {
+      connection.query(`UPDATE lastOnline SET date=? WHERE userID=?`, [date, oldMember.id], function(error, results, fields) {
         if(error) throw error;
       })
     }
   })
 }
 
-function gameUpdate(oldMember, newMember, date, afk) {
-  if(afk) {
-
-  } else {
-    if(newMember.presence.game) {
-      // Return if same
-      if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-      // Als hij nog nu een game aan het spelen is
-      if(oldMember.presence.game) {
-        // Als de game veranderd is
-        console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
-        connection.query(`UPDATE playtime SET endDate=${connection.escape(date)} WHERE userID=${oldMember.id} AND game=${connection.escape(oldMember.presence.game.name)} AND endDate IS NULL`, function(error, results, fields) {
-          if(error) throw error;
-        })
-        connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
-          if(error) throw error;
-        })
-      } else {
-        // Als hij begonnen is met spelen
-        console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
-        connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
-          if(error) throw error;
-        })
-      }
-    } else if(oldMember.presence.game) {
-      // Als hij gestopt is met spelen
-      console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+function gameUpdate(oldMember, newMember, date) {
+  if(newMember.presence.game) {
+    // Return if same
+    if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
+    // Als hij nog nu een game aan het spelen is
+    if(oldMember.presence.game) {
+      // Als de game veranderd is
+      console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
       connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
         if(error) throw error;
       })
+      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
+        if(error) throw error;
+      })
+    } else {
+      // Als hij begonnen is met spelen
+      console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
+        if(error) throw error;
+      })
     }
+  } else if(oldMember.presence.game) {
+    // Als hij gestopt is met spelen
+    console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+    connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
+      if(error) throw error;
+    })
   }
-
-  
 }
 
 client.on("ready", () => {
