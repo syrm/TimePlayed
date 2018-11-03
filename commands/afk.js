@@ -9,8 +9,8 @@ module.exports = function(obj) {
                 return message.reply(lang.commands.afk.toggleOff)
             })
         } else {
-            connection.query("INSERT INTO afk (userID) VALUES (?)", [message.author.id], function(error, results, fields) {
-                return message.reply(lang.commands.afk.toggleOn)
+            connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND endDate IS NULL`, [new Date(), message.author.id], function(error, results, fields) {
+                return message.reply(lang.commands.afk.toggleOn);
             })
         }
     })
