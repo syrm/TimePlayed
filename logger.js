@@ -14,12 +14,12 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
-console.log("Clearing up invalid dates...");
+/*console.log("Clearing up invalid dates...");
 connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
   if(error) throw error;
   console.log("Clearup done");
   dataReady();
-})
+})*/
 
 var toCheck = []
 
