@@ -52,7 +52,13 @@ function lastOnline(oldMember, newMember, date) {
   })
 }
 
-function gameUpdate(oldMember, newMember, date) {
+function gameUpdate(oldMember, newMember, date, afk) {
+  function removeAfk() {
+    if(afk) {
+      connection.query("DELETE FROM afk WHERE userID=?", [oldMember.id], function(error, results, fields) {
+      })
+    }
+  }
   if(newMember.presence.game) {
     // Return if same
     if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
@@ -66,12 +72,14 @@ function gameUpdate(oldMember, newMember, date) {
       connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
         if(error) throw error;
       })
+      removeAfk();
     } else {
       // Als hij begonnen is met spelen
       console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
       connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
         if(error) throw error;
       })
+      removeAfk();
     }
   } else if(oldMember.presence.game) {
     // Als hij gestopt is met spelen
@@ -79,6 +87,7 @@ function gameUpdate(oldMember, newMember, date) {
     connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
       if(error) throw error;
     })
+    removeAfk();
   }
 }
 
