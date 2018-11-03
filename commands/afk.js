@@ -6,11 +6,19 @@ module.exports = function(obj) {
     connection.query("SELECT count(*) FROM afk WHERE userID=?", [message.author.id], function(error, results, fields) {
         if(results[0]["count(*)"] > 0) {
             connection.query("DELETE FROM afk WHERE userID=?", [message.author.id], function(error, results, fields) {
-                return message.reply(lang.commands.afk.toggleOff)
+                if(message.author.presence.game) {
+                    connection.query("INSERT INTO playtime (userID, game, startDate) VALUES (?, ?, ?)", [message.author.id, message.author.presence.game.name, new Date()], function(error, results, fields) {
+                        return message.reply(lang.commands.afk.toggleOff)
+                    })
+                } else {
+                    return message.reply(lang.commands.afk.toggleOff)
+                }
             })
         } else {
-            connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND endDate IS NULL`, [new Date(), message.author.id], function(error, results, fields) {
-                return message.reply(lang.commands.afk.toggleOn);
+            connection.query("INSERT INTO afk (userID) VALUES (?)", [message.author.id], function(error, results, fields) {
+                connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND endDate IS NULL`, [new Date(), message.author.id], function(error, results, fields) {
+                    return message.reply(lang.commands.afk.toggleOn);
+                })
             })
         }
     })
