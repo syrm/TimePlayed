@@ -12,6 +12,7 @@ module.exports = {
     timeplayed: require("./timePlayed.js"),
     topplayed: require("./topPlayed.js"),
     playing: require("./playing.js"),
+    afk: require("./afk.js"),
     help: require("./help.js"),
     erase: require("./erase.js"),
     invite: require("./invite.js"),
