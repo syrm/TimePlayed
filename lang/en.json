@@ -87,7 +87,7 @@
         },
         "afk": {
             "args": "",
-            "aliases": "!!pause",
+            "aliases": ["pause"],
             "helpDescription": "Toggle your AFK status",
             "category": "Playtime commands",
             "fullDescription": "This command toggles your AFK status. If you go AFK, your playtime won't be logged anymore and it will be displayed on your `%prefix%status` page.",
