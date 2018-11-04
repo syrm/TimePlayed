@@ -3,7 +3,6 @@ module.exports = function(acceptMessage) {
     const collector = acceptMessage.createReactionCollector(filter);
     collector.on('collect', (reaction, user) => {
       user = reaction.users.last()
-      var lang = JSON.parse(JSON.stringify(en));
       tools.setTerms(user.id, true, function() {
         reaction.message.channel.send(`<@${user.id}> Success!`).then(msg => {msg.delete(2000)})
       })
