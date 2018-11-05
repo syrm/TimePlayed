@@ -14,14 +14,44 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
-/*console.log("Clearing up invalid dates...");
-connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
-  if(error) throw error;
-  console.log("Clearup done");
-  dataReady();
-})*/
+function clearup(table, callback) {
+  connection.query(`SELECT * FROM ${table} WHERE endDate IS NULL`, function(error, results, fields) {
+    var toEnd = [];
+    results.forEach(result => {
+      var user = client.users.get(result.userID);
+      if(!user.presence.game) {
+        toEnd.push(user.id);
+      } else if(user.presence.game.name != result.game) {
+        toEnd.push(user.id);
+        connection.query(`INSERT INTO ${table} (userID, game, startDate) VALUES (?, ?, ?)`, [user.id, user.presence.game.name, new Date()], function(error, results, fields) {})
+      }
+    })
+    if(toEnd.length > 0) {
+      connection.query(`UPDATE ${table} SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        setTimeout(function() {
+          callback()
+        }, 2000);
+      })
+    } else {
+      setTimeout(function() {
+        callback()
+      }, 2000);
+    }
+  })
+}
 
 var toCheck = []
+var premiumGuilds = [];
+function updatePremiumGuilds() {
+  console.log("Updating premium server list...");
+  connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+    results.forEach(result => {
+        premiumGuilds.push(result.guildID);
+    })
+  })
+}
+updatePremiumGuilds();
+setInterval(updatePremiumGuilds, 60000);
 
 function refresh() {
   console.log("Refreshing...")
@@ -34,7 +64,6 @@ function refresh() {
     toCheck = []
   })
 }
-
 
 function lastOnline(oldMember, newMember, date) {
   if(oldMember.presence.status == newMember.presence.status || newMember.presence.status != "offline") return;
@@ -92,10 +121,15 @@ function gameUpdate(oldMember, newMember, date, afk) {
 }
 
 client.on("ready", () => {
-  console.log("Ready!");
-  refresh()
-  console.log("Started logging")
-  setInterval(refresh, 5000)
+  console.log("Clearing up restart differences...");
+  clearup("playtime", function() {
+    clearup("guildStats", function() {
+      console.log("Clearup done");
+      refresh()
+      console.log("Started logging")
+      setInterval(refresh, 5000)
+    })
+  })
 });
 
 client.on("guildMemberRemove", member => {
@@ -117,11 +151,47 @@ client.on("guildMemberRemove", member => {
     }
   });
 })
+// For regular logging
 client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
   var sharedGuilds = client.guilds.filter(guild => {return guild.members.get(oldMember.id)}).keyArray()
   if(sharedGuilds.indexOf(oldMember.guild.id) != 0) return;
   toCheck.push([oldMember, newMember, new Date()])
+})
+
+// For server stats logging
+client.on("presenceUpdate", (oldMember, newMember) => {
+  var guild = oldMember.guild;
+  var date = new Date();
+  // Return if guild isn't premium
+  if(!premiumGuilds.includes(guild.id)) return;
+  // Return if same
+  if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
+  if(newMember.presence.game) {
+    // Als hij nog nu een game aan het spelen is
+    if(oldMember.presence.game) {
+      // Als de game veranderd is
+      console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+      connection.query(`UPDATE guildStats SET endDate=? WHERE guildID=? AND userID=? AND game=? AND endDate IS NULL`, [date, guild.id, oldMember.id, oldMember.presence.game.name, guild.id], function(error, results, fields) {
+        if(error) throw error;
+      })
+      connection.query(`INSERT INTO guildStats (guildID, userID, game, startDate) VALUES ?`, [[[guild.id, oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
+        if(error) throw error;
+      })
+    } else {
+      // Als hij begonnen is met spelen
+      console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+      connection.query(`INSERT INTO guildStats (guildID, userID, game, startDate) VALUES ?`, [[[guild.id, oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
+        if(error) throw error;
+      })
+    }
+  } else if(oldMember.presence.game) {
+    // Als hij gestopt is met spelen
+    console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+    connection.query(`UPDATE guildStats SET endDate=? WHERE guildID=? AND userID=? AND game=? AND endDate IS NULL`, [date, guild.id, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
+      if(error) throw error;
+    })
+  }
 })
 
 client.login(token);
