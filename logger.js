@@ -19,6 +19,7 @@ function clearup(table, callback) {
     var toEnd = [];
     results.forEach(result => {
       var user = client.users.get(result.userID);
+      if(!user) return;
       if(!user.presence.game) {
         toEnd.push(user.id);
       } else if(user.presence.game.name != result.game) {
