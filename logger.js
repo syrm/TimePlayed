@@ -44,10 +44,11 @@ function clearup(table, callback) {
 var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
-  console.log("Updating premium server list...");
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+    premiumGuilds = [];
     results.forEach(result => {
         premiumGuilds.push(result.guildID);
+        console.log("Premium list updated");
     })
   })
 }
@@ -95,7 +96,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
     // Als hij nog nu een game aan het spelen is
     if(oldMember.presence.game) {
       // Als de game veranderd is
-      console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+      console.log(`Regular: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
       connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
         if(error) throw error;
       })
@@ -105,7 +106,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
       removeAfk();
     } else {
       // Als hij begonnen is met spelen
-      console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+      console.log(`Regular: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
       connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
         if(error) throw error;
       })
@@ -113,7 +114,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
     }
   } else if(oldMember.presence.game) {
     // Als hij gestopt is met spelen
-    console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+    console.log(`Regular: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
     connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
       if(error) throw error;
     })
@@ -126,8 +127,8 @@ client.on("ready", () => {
   clearup("playtime", function() {
     clearup("guildStats", function() {
       console.log("Clearup done");
-      refresh()
       console.log("Started logging")
+      refresh()
       setInterval(refresh, 5000)
     })
   })
@@ -172,7 +173,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
     // Als hij nog nu een game aan het spelen is
     if(oldMember.presence.game) {
       // Als de game veranderd is
-      console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+      console.log(`guildStats: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
       connection.query(`UPDATE guildStats SET endDate=? WHERE guildID=? AND userID=? AND game=? AND endDate IS NULL`, [date, guild.id, oldMember.id, oldMember.presence.game.name, guild.id], function(error, results, fields) {
         if(error) throw error;
       })
@@ -181,14 +182,14 @@ client.on("presenceUpdate", (oldMember, newMember) => {
       })
     } else {
       // Als hij begonnen is met spelen
-      console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+      console.log(`guildStats: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
       connection.query(`INSERT INTO guildStats (guildID, userID, game, startDate) VALUES ?`, [[[guild.id, oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
         if(error) throw error;
       })
     }
   } else if(oldMember.presence.game) {
     // Als hij gestopt is met spelen
-    console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+    console.log(`guildStats: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
     connection.query(`UPDATE guildStats SET endDate=? WHERE guildID=? AND userID=? AND game=? AND endDate IS NULL`, [date, guild.id, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
       if(error) throw error;
     })
