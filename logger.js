@@ -48,8 +48,8 @@ function updatePremiumGuilds() {
     premiumGuilds = [];
     results.forEach(result => {
         premiumGuilds.push(result.guildID);
-        console.log("Premium list updated");
     })
+    console.log("Premium list updated");
   })
 }
 updatePremiumGuilds();
