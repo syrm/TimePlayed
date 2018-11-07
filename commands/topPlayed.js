@@ -6,7 +6,7 @@ module.exports = function(obj) {
     var lang = obj.lang;
     var meantUser = obj.meantUser;
     
-    message.channel.send('<a:loading:455383347921682433>').then(msg => {
+    message.channel.send(lang.general.loadingMessage).then(msg => {
         tools.getStartDate(meantUser.id, function(startDate) {
             var sinceWarning = false;
             if(handledArgs.since && tools.convert.sinceDate(handledArgs.since) < startDate) sinceWarning = true;

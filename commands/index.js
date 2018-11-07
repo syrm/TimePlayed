@@ -17,5 +17,6 @@ module.exports = {
     erase: require("./erase.js"),
     invite: require("./invite.js"),
     lastplayed: require("./lastPlayed.js"),
-    accept: require("./accept.js")
+    accept: require("./accept.js"),
+    serverstats: require("./serverStats.js")
 }

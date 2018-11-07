@@ -22,7 +22,8 @@
     },
     "general": {
         "termsAccepted": "Success! From now on, I will log your playtime, so please try out some of my commands!\nOf course I can't look back in time, so please don't expect that I already have your playtime logged, from now on I will start logging it.",
-        "globalAccept": "​​​​Hi members of `%guild%`, I'm TimePlayed. I'm a bot that logs your playtime, so you can keep track of which games you play.\nIf you want me to track your playtime, please react with ✅ to accept to my Terms of Service (https://timeplayed.xyz/terms-of-service.html).\nAfter reacting, I will start logging your playtime!"
+        "globalAccept": "​​​​Hi members of `%guild%`, I'm TimePlayed. I'm a bot that logs your playtime, so you can keep track of which games you play.\nIf you want me to track your playtime, please react with ✅ to accept to my Terms of Service (https://timeplayed.xyz/terms-of-service.html).\nAfter reacting, I will start logging your playtime!",
+        "loadingMessage": "<a:loading:455383347921682433>"
     },
     "vars": {
         "prefix": "%prefix%"
@@ -117,6 +118,14 @@
             "gamePlaying": "%personUpper% %be% currently %type%",
             "presence": "%possessiveUpper% Discord presence is set to: **%presence%**",
             "noGame": "According to Discord %person% %be%n't playing a game"
+        },
+        "serverStats": {
+            "args": "[game]",
+            "aliases": ["guildstats", "serverinfo"],
+            "helpDescription": "Get some interesting stats of this server",
+            "category": "Playtime commands",
+            "fullDescription": "Coming soon",
+            "PMSupport": false
         },
         "help": {
             "args": "",
