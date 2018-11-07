@@ -1,7 +1,7 @@
 const tools = require("../tools");
 var connection = tools.getConnection;
 
-function getRole(string, guild) {
+function getRole(string, guild, message) {
   if(string == undefined) return undefined;
   var roleID = string.replace("<@", "").replace(">", "");
   if(guild.roles.get(roleID) != undefined) return message.guild.roles.get(roleID);
@@ -19,7 +19,7 @@ module.exports = function(obj) {
       if(message.guild.me.hasPermission("MANAGE_ROLES") == false) {
         return message.reply(lang.commands.addRole.noPermission)
       }
-      var role = getRole(handledArgs.role, message.guild)
+      var role = getRole(handledArgs.role, message.guild, message)
       if(!role) return message.reply(lang.commands.addRole.cantFindRole.replace("%role%", handledArgs.role))
       if(guildConf.roleAwards.length > 2 && !premium) return message.reply(lang.commands.addRole.threeRolesMax)
       if(guildConf.roleAwards.length > 9) return message.reply(lang.commands.addRole.tenRolesMax)
