@@ -59,6 +59,7 @@ module.exports = function(obj) {
           function topListToString(list, days) {
             if(!list && days == 7) return "Can't show, playtime started measuring after a week ago!";
             if(!list && days == 30) return "Can't show, playtime started measuring after a month ago!";
+            if(!list) return "No playtime logged (yet)!"
             if(list.length < 1) return "Nothing to show!";
             var str = "";
             list.forEach((obj, i) => {
