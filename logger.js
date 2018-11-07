@@ -163,6 +163,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 
 // For server stats logging
 client.on("presenceUpdate", (oldMember, newMember) => {
+  if(oldMember.user.bot) return;
   var guild = oldMember.guild;
   var date = new Date();
   // Return if guild isn't premium
