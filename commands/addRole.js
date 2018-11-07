@@ -3,9 +3,10 @@ var connection = tools.getConnection;
 
 function getRole(string, guild, message) {
   if(string == undefined) return undefined;
-  var roleID = string.replace("<@", "").replace(">", "");
+  var regex = /[<@&>]/gm;
+  var roleID = string.replace(regex, "");
   if(guild.roles.get(roleID) != undefined) return message.guild.roles.get(roleID);
-  if(guild.roles.find(e => e.name == string) != undefined) return guild.roles.find(e => e.name == string);
+  if(guild.roles.find(e => e.name == string) != undefined) return guild.roles.find(e => e.name.toLowerCase() == string.toLowerCase());
   // If nothing was found, return undefined
   return undefined;
 }
