@@ -1,5 +1,5 @@
 const keys = require('./keys.json');
-const token = keys.botToken;
+const token = "NDMzNjI1Mzk5Mzk4ODkxNTQx.Dn-fkg.xM3BhSQLtkzjMCVhvTWAm6xUbZw";
 const Discord = require("discord.js");
 const fs = require('fs')
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true});
@@ -239,38 +239,35 @@ function updateRoles() {
               foundIndex = index;
             }
           })
-          if(foundIndex != undefined) {
-            guild.members.forEach(member => {
-              var index = results[foundIndex].results.map(e => {return e.id}).indexOf(member.id)
-              var userResult = results[foundIndex].results[index]
-              var role = guild.roles.get(award.roleID)
-              var highestBotRole = guild.me.roles.sort(function(a, b) {
-                return a.position < b.position
-              }).first()
-              if(index != -1 && role != undefined) {
-                if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
-                var awardDate = new Date();
-                awardDate.setSeconds(awardDate.getSeconds() - award.time);
-                if(member.roles.get(award.roleID)) {
-                  if(userResult.seconds * 1000 < Math.abs(new Date() - awardDate)) {
-                    // Remove role/send message
-                    member.removeRole(role)
-                    .catch(err => console.log(err))
-                    removeCount++
-                    console.log(`Removed ${member.displayName} from the ${role.name} role.`)
-                  }
-                } else {
-                  if(userResult.minutes * 1000 > Math.abs(new Date() - awardDate)) {
-                    // Add role/send message
-                    member.addRole(role)
-                    .catch(err => console.log(err))
-                    addCount++
-                    console.log(`Added ${member.displayName} to the ${role.name} role.`)
-                  }
+          if(foundIndex == undefined) return;
+          guild.members.forEach(member => {
+            var index = results[foundIndex].results.map(e => {return e.id}).indexOf(member.id)
+            var userResult = results[foundIndex].results[index]
+            var role = guild.roles.get(award.roleID)
+            var highestBotRole = guild.me.roles.sort(function(a, b) {
+              return a.position < b.position
+            }).first()
+            if(index != -1 && role != undefined) {
+              if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
+              if(member.roles.get(award.roleID)) {
+                if(userResult.seconds  < award.time) {
+                  // Remove role/send message
+                  member.removeRole(role)
+                  .catch(err => console.log(err))
+                  removeCount++
+                  console.log(`Removed ${member.displayName} from the ${role.name} role.`)
+                }
+              } else {
+                if(userResult.seconds > award.time) {
+                  // Add role/send message
+                  member.addRole(role)
+                  .catch(err => console.log(err))
+                  addCount++
+                  console.log(`Added ${member.displayName} to the ${role.name} role.`)
                 }
               }
-            })
-          }
+            }
+          })
         })
       })
       console.timeEnd("Updating role awards took");
