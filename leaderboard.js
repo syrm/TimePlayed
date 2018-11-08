@@ -249,8 +249,10 @@ function updateRoles() {
               }).first()
               if(index != -1 && role != undefined) {
                 if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
+                var awardDate = new Date();
+                awardDate.setSeconds(awardDate.getSeconds() - award.time);
                 if(member.roles.get(award.roleID)) {
-                  if(userResult.minutes * 60000 < Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
+                  if(userResult.seconds * 1000 < Math.abs(new Date() - awardDate)) {
                     // Remove role/send message
                     member.removeRole(role)
                     .catch(err => console.log(err))
@@ -258,7 +260,7 @@ function updateRoles() {
                     console.log(`Removed ${member.displayName} from the ${role.name} role.`)
                   }
                 } else {
-                  if(userResult.minutes * 60000 > Math.abs(new Date() - tools.convert.sinceDate(award.time))) {
+                  if(userResult.minutes * 1000 > Math.abs(new Date() - awardDate)) {
                     // Add role/send message
                     member.addRole(role)
                     .catch(err => console.log(err))

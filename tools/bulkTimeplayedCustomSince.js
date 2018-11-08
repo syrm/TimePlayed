@@ -15,7 +15,8 @@ module.exports =  function(guilds, callback) {
   connection.query(permQuery, function(error, permResults, fields) {
     var finalResults = []
     guilds.forEach((guild, index) => {
-      var since = tools.convert.sinceDate(guild.since);
+      var since = new Date();
+      since.setSeconds(since.getSeconds() - guild.since);
       var guildResults = [];
       permResults.forEach((value, i) => {
         if(!value.endDate) {
@@ -40,9 +41,9 @@ module.exports =  function(guilds, callback) {
         }
         if(guildResults.some(e => e.id == value.userID)) {
           var i = guildResults.map(function(e) { return e.id; }).indexOf(value.userID);
-          guildResults[i].minutes += msCount / 60000;
+          guildResults[i].seconds += msCount / 1000;
         } else {
-          guildResults.push({id: value.userID, minutes: msCount / 60000})
+          guildResults.push({id: value.userID, seconds: msCount / 1000})
         }
       })
       finalResults.push({guildID: guild.guildID, game: guild.game, since: guild.since, results: guildResults})
