@@ -1,5 +1,5 @@
 const keys = require('./keys.json');
-const token = "NDMzNjI1Mzk5Mzk4ODkxNTQx.Dn-fkg.xM3BhSQLtkzjMCVhvTWAm6xUbZw";
+const token = keys.botToken;
 const Discord = require("discord.js");
 const fs = require('fs')
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true});
