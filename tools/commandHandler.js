@@ -67,6 +67,33 @@ module.exports = function(args, defaultGame, command) {
     results.type = typeOf(args.slice(1).join(" "))
     return results;
   }
+  if(command == "serverstats") {
+    var results = {wrongSyntax: false, gamesOnly: false, sortBy: "time"}
+    var game = JSON.parse(JSON.stringify(args));
+    args.forEach(arg => {
+      function rm() {
+        var i = game.indexOf(arg);
+        if (i > -1) {
+          game.splice(i, 1);
+        }
+      }
+      if(/-?games\W?only|only\W?games/gmi.test(arg)) {
+        results.gamesOnly = true;
+        rm();
+      }
+      if(/-count/gmi.test(arg)) {
+        results.sortBy = "count";
+        rm();
+      }
+      if(/-time/gmi.test(arg)) {
+        rm();
+      }
+    })
+    if(game.length > 0) {
+      results.game = game.join(" ");
+    }
+    return results;
+  }
   var results = {wrongSyntax: false}
   var mentionIndex;
   var sinceIndex;

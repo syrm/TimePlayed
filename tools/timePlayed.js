@@ -2,9 +2,7 @@ var tools = require('./index.js')
 var connection = require('./connection.js');
 
 module.exports =  function(id, game, sinces, callback) {
-  if(!sinces) {
-    return callback()
-  }
+  if(!sinces) return callback()
   connection.query("SET CHARACTER SET utf8mb4", function(error, results, fields) {
     connection.query(`SELECT game, startDate, endDate FROM playtime WHERE userID=? AND game=?`, [id, game], function(error, permResults, fields) {
       var results = [];

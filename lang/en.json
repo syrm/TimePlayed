@@ -120,9 +120,9 @@
             "noGame": "According to Discord %person% %be%n't playing a game"
         },
         "serverStats": {
-            "args": "[game]",
+            "args": "[game|games-only] -[time|count]",
             "aliases": ["guildstats", "serverinfo"],
-            "helpDescription": "Get some interesting stats of this server",
+            "helpDescription": "Get some interesting stats of this server's playtime",
             "category": "Playtime commands",
             "fullDescription": "Coming soon",
             "PMSupport": false
