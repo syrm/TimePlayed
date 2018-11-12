@@ -23,8 +23,10 @@ module.exports = function(obj) {
         matches.sort(function(a, b) {
           return a[1] - b[1];
         });
-        var bestMatch = matches[0][0]
-        var bestMatchNum = matches[0][1]
+        if(matches[0]) {
+          var bestMatch = matches[0][0]
+          var bestMatchNum = matches[0][1]
+        }
         connection.query("SELECT game FROM gameAliases WHERE alias=?", [handledArgs.other], function(error, aliases, fields) {
           var alias;
           if(aliases.length > 0) alias = aliases[0].game
