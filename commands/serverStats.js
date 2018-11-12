@@ -111,7 +111,7 @@ module.exports = function(obj) {
           });
           var bestMatch = matches[0][0]
           var bestMatchNum = matches[0][1]
-          if(bestMatchNum > 5) return msg.edit(`It seems like no one in this server ever played \`${handledArgs.game}\` or something simalar! Please check your spelling or try again with a different game.`)
+          if(bestMatchNum > 4) return msg.edit(`It seems like no one in this server ever played \`${handledArgs.game}\` or something simalar! Please check your spelling or try again with a different game.`)
           handledArgs.game = bestMatch;
           connection.query("SELECT * FROM guildStats WHERE guildID=? AND game=?", [message.guild.id, bestMatch], function(error, results, fields) {
             var numUsers = [];

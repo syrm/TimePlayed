@@ -81,11 +81,11 @@ module.exports = function(args, defaultGame, command) {
         results.gamesOnly = true;
         rm();
       }
-      if(/-count/gmi.test(arg)) {
+      if(/-?count/gmi.test(arg)) {
         results.sortBy = "count";
         rm();
       }
-      if(/-time/gmi.test(arg)) {
+      if(/-?time/gmi.test(arg)) {
         rm();
       }
     })
