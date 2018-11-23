@@ -17,12 +17,12 @@
         "stillAccept": "Hi there! I see you have previously declined my terms of service, so to use my commands please still accept them.",
         "reactionMessage": "\nReact with ✅ to accept my terms of service, ignore this message to decline.",
         "commandMessage": "\nPlease type `%prefix%accept` to accept to my terms of service.",
-        "acceptMessageSuffix": "\nBy accepting you basically **give me the permission to log your playtime data** using your Discord presence.\nMy full Terms of Service are available at https://timeplayed.xyz/terms-of-service.html",
+        "acceptMessageSuffix": "\nBy accepting you basically **give me the permission to log your playtime data** using your Discord presence.\nMy full Terms of Service are available at http://www.timeplayed.xyz/terms-of-service",
         "mentionNoAccept": "The user you mentioned declined/didn't yet accept my terms of service, so I can't show you their playtime!\nAsk them to run any of my commands and accept to the terms of service to view their playtime."
     },
     "general": {
         "termsAccepted": "Success! From now on, I will log your playtime, so please try out some of my commands!\nOf course I can't look back in time, so please don't expect that I already have your playtime logged, from now on I will start logging it.",
-        "globalAccept": "​​​​Hi members of `%guild%`, I'm TimePlayed. I'm a bot that logs your playtime, so you can keep track of which games you play.\nIf you want me to track your playtime, please react with ✅ to accept to my Terms of Service (https://timeplayed.xyz/terms-of-service.html).\nAfter reacting, I will start logging your playtime!",
+        "globalAccept": "​​​​Hi members of `%guild%`, I'm TimePlayed. I'm a bot that logs your playtime, so you can keep track of which games you play.\nIf you want me to track your playtime, please react with ✅ to accept to my Terms of Service (http://www.timeplayed.xyz/terms-of-service).\nAfter reacting, I will start logging your playtime!",
         "loadingMessage": "<a:loading:455383347921682433>"
     },
     "vars": {
@@ -46,7 +46,7 @@
             "playtimeCommand": true,
             "title": "%possessiveUpper% %game% playtime",
             "customSince": "%customSince%, %person% %have% played `%timePlayedCustom%` %game%!",
-            "noPlaytime": "%personUpper% %have%n't (according to Discord) ever played `%game%` since I measured %possessive% playtime! If you think this is a mistake, please take a good look at https://timeplayed.xyz/faq-support.html#noGame\n(playtime measured since `%startDateString%`)",
+            "noPlaytime": "%personUpper% %have%n't (according to Discord) ever played `%game%` since I measured %possessive% playtime! If you think this is a mistake, please take a good look at http://www.timeplayed.xyz/faq-support#noGame\n(playtime measured since `%startDateString%`)",
             "weekTitle": "7 days",
             "week": "In the last 7 days, %person% %have% played `%timePlayedWeek%` %game%",
             "weekNoInfo": "%possessiveUpper% data %have%n't been logged since %startDateString%, so I can't show you this information!",
@@ -65,8 +65,8 @@
             "fullDescription": "This command gives you a list of games you (or someone) play(s) the most. You can specify the time period since when the information will be given.",
             "PMSupport": true,
             "playtimeCommand": true,
-            "noGame": "I don't excactly know what you mean by the `%arg%` argument. It could be two things:\n- If you are trying to specify a game: please use the `%prefix%timePlayed` command instead\n- If you're trying to specify a custom since time: please take a look at this page: https://timeplayed.xyz/commands.html or type `%prefix%help`",
-            "noGameEver": "%possessiveUpper% %have%n't (according to Discord) ever played a game since I measured %possessive% playtime! If you think this is a mistake, please take a good look at https://timeplayed.xyz/faq-support.html#noGame\n(playtime measured since %startDateString%)\n",
+            "noGame": "I don't excactly know what you mean by the `%arg%` argument. It could be two things:\n- If you are trying to specify a game: please use the `%prefix%timePlayed` command instead\n- If you're trying to specify a custom since time: please take a look at this page: http://www.timeplayed.xyz/commands or type `%prefix%help`",
+            "noGameEver": "%possessiveUpper% %have%n't (according to Discord) ever played a game since I measured %possessive% playtime! If you think this is a mistake, please take a good look at http://www.timeplayed.xyz/faq-support#noGame\n(playtime measured since %startDateString%)\n",
             "noGamePeriod": "**%possessiveUpper% %have%n't played any game in that time period!**",
             "title": "\n%possessiveUpper% most played games are:\n",
             "titleCustomSince": "\n%customSince%, %possessive% most played games are:\n",
@@ -138,7 +138,7 @@
             "description": "Here you'll find a list of all of my commands!\n- () arguments are required, [] arguments are optional.\n- Type `%prefix%help (command)` for an extended command description\n- The prefix in this server is `%prefix%`\n- The [time] argument should be specified as a number with `m/h/d/w` behind it or as `today`, for example: `%prefix%topPlayed 5d`",
             "PMDescription": "Here you'll find a list of all of my commands!\n- () arguments are required, [] arguments are optional\n- Type `%prefix%help (command)` for an extended command description\n- These are only my PM supported commands, I have more commands, to get a list of them type `!!help` in a server text channel.\n- The prefix for PM commands is `!!`, or you can use my commands without any prefix\n- The [time] argument should be specified as a number with `m/h/d/w` behind it or as `today`, for example: `%prefix%topPlayed 5d`",
             "linksTitle": "Useful links",
-            "links": "[Website](https://timeplayed.xyz) | [Support Server](https://discord.gg/ghErkyt) | [Patreon](https://www.patreon.com/TimePlayed) | [Invite me](http://invite.timeplayed.xyz) | [Terms of Service](https://timeplayed.xyz/terms-of-service.html)",
+            "links": "[Website](http://www.timeplayed.xyz) | [Support Server](https://discord.gg/ghErkyt) | [Patreon](https://www.patreon.com/TimePlayed) | [Invite me](http://invite.timeplayed.xyz) | [Terms of Service](http://www.timeplayed.xyz/terms-of-service)",
             "fullDescriptionDescription": "Welcome to the full info page of the **%command%** command.",
             "syntax": "The correct syntax of this command is: `%syntax%`"
         },
@@ -165,7 +165,7 @@
             "helpDescription": "Get a link to invite me to your server",
             "fullDescription": "This command simply gives you a link to invite the bot to your server, along with some getting started information.",
             "PMSupport": true,
-            "msg": "Here's my invite link: <http://invite.timeplayed.xyz/>\nIf it doesn't work please try this one: <https://discordapp.com/oauth2/authorize?client_id=433625399398891541&scope=bot&permissions=268708928>\nAnd here's some help to get started with me: <https://timeplayed.xyz/getting-started.html>"
+            "msg": "Here's my invite link: <http://invite.timeplayed.xyz/>\nIf it doesn't work please try this one: <https://discordapp.com/oauth2/authorize?client_id=433625399398891541&scope=bot&permissions=268708928>\nAnd here's some help to get started with me: <http://www.timeplayed.xyz/getting-started>"
         },
         "setPrivacy": {
             "args": "",
@@ -191,9 +191,9 @@
         "accept": {
             "args": "",
             "aliases": [],
-            "helpDescription": "Comfirm that you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html)",
+            "helpDescription": "Comfirm that you accept to my [Terms of Service](http://www.timeplayed.xyz/terms-of-service)",
             "category": "Privacy commands",
-            "fullDescription": "This command lets you accept to my [Terms of Service](https://timeplayed.xyz/terms-of-service.html). After running this command, I will start logging your playtime and you will be able to use my commands.",
+            "fullDescription": "This command lets you accept to my [Terms of Service](http://www.timeplayed.xyz/terms-of-service). After running this command, I will start logging your playtime and you will be able to use my commands.",
             "PMSupport": true
         },
         "erase": {
@@ -237,17 +237,17 @@
         },
         "addRole": {
             "args": "(@role/roleID/role Name) (time)/(time) [game]",
-            "aliases": ["addreward", "newreward", "newaward"],
+            "aliases": ["addreward", "newreward", "newaward", "addaward"],
             "helpDescription": "Automatically assign roles to users when they reach a specified amount of playtime in a period of time",
             "category": "Admin commands",
             "fullDescription": "This command adds a role award to the server, a specified role will be given when members of this server reach a specified amount of playtime, of a specified game in a specified period of time.\nThe first `(time)` of the `(time)/(time)` argument should be the amount of playtime users need to reach, the second `(time)` needs to be the period of time the playtime needs to be in.\nHere's an example: when I want to assign the Tryhard role to users when they play more than 10 hours per week Overwatch, I'll have to run the following command: `%prefix%addRole Tryhard 10h/week Overwatch`",
             "PMSupport": false,
             "noPermission": "I don't have the permission to assign roles to users! Please go to my role in the server settings, turn on the `Manage Roles` permission and run this command again.",
-            "cantFindRole": "I can't find the role you specified (%role%)! Please mention the role, give me the ID or give me the name of the role and run this command again.\nPlease note that the role names are **case sensitive**.",
+            "cantFindRole": "I can't find the role you specified (%role%)! Please mention the role, give me the ID or give me the name of the role and run this command again.\nPlease note that the role names are **case sensitive**.\nIf you're having trouble adding a role award, you can very easily add role awards on this server's online dashboard at http://www.timeplayed.xyz/dashboard/%guildId%/role-awards",
             "threeRolesMax": "You can only add up to 3 role awards without premium! To add more roles, remove a role by typing `%prefix%removeRole` or buy premium.",
             "tenRolesMax": "You can only add up to 10 role awards! If you really wish to add more role awards (which seems unlikely), please contact me on Discord for a custom premium plan (my Discord name is: xVaql#4581)",
-            "roleTooHigh": "The role you tried to assign is positioned higher or equal than my highest role, so I can't assign that role to users. Please move my role above the role you tried to assign, or move the role you tried to assign underneath my role and run this command again.",
-            "alreadyAssigned": "That role is already assigned automatically in this server! You can't add two role awards to avoid collisons and unexpected errors, so please create another role for this award or remove the role with `%prefix%removeRole`",
+            "roleTooHigh": "The role you tried to assign is positioned higher or equal than my highest role, so I can't assign that role to users. Please move my role above the role you tried to assign, or move the role you tried to assign underneath my role and run this command again.\nIf you're having trouble adding a role award, you can very easily add role awards on this server's online dashboard at http://www.timeplayed.xyz/dashboard/%guildId%/role-awards",
+            "alreadyAssigned": "That role is already assigned automatically in this server! You can't add two role awards to avoid collisons and unexpected errors, so please create another role for this award or remove the role with `%prefix%removeRole`\nIf you're having trouble adding a role award, you can very easily add role awards on this server's online dashboard at http://www.timeplayed.xyz/dashboard/%guildId%/role-awards",
             "success": "Success! Users will now automatically get the %role% role awarded when playing more than `%neededTime%/%timePeriod%` `%game%`.\n",
             "defaultGameNote": "\nNote: you didn't specify a game, so I took the server's default game (`%game%`)"
         },
