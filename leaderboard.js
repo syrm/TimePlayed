@@ -156,13 +156,11 @@ function updateRankingChannel() {
               fetchBotMessages(20, rankingChannel)
                 .then((message) => {
                 if(message == undefined) {
-                  purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
                   rankingChannel.send(topListToString(topLists, guildConf, guild.id))
                   console.log(`${Date()}: ${guild.name} leaderboard sent!`)
                 } else {
                   message.edit(topListToString(topLists, guildConf, guild.id))
                   console.log(`${Date()}: ${guild.name} leaderboard edited!`)
-                  purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
                 }
               })
               .catch((err) => {
@@ -197,7 +195,7 @@ async function purge(purgeLimit, channel) {
   if(fetched.first()) {
     // Filteren
     fetched = fetched.filter(currentMSG => currentMSG.author.id != client.user.id);
-    channel.bulkDelete(fetched).catch(err => {console.log(err)})
+    channel.bulkDelete(fetched).catch(err => {console.log("Error bulk deleting messages")})
   }
   fetched = fetched.filter(function (msg) {return msg.author.id == "423433861167579136"});
 }
