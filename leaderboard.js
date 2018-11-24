@@ -117,7 +117,6 @@ function updateRankingChannel() {
   client.guilds.forEach(guild => {
     ids.push(guild.id)
   })
-  console.log(ids);
   tools.getGuildConfigs(function(configs) {
     getPremiumGuilds(function(premiums) {
       client.guilds.forEach(function(guild, index) {
