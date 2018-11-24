@@ -21,7 +21,7 @@ module.exports = function(obj) {
       }
     })
     if(message.member.hasPermission("ADMINISTRATOR")) {
-      string += `To manage these awards, try the \`${guildConf.prefix}addRole\` and \`${guildConf.prefix}removeRole\` command or visit this server's dashboard: http://www.timeplayed.xyz/dashboard/${message.guild.id}/role-awards`
+      string += `To manage these awards, try the \`${guildConf.prefix}addRole\` and \`${guildConf.prefix}removeRole\` command or visit this server's dashboard: <http://www.timeplayed.xyz/dashboard/${message.guild.id}/role-awards>`
     }
     return message.channel.send(string)
   })

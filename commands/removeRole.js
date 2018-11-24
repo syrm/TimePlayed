@@ -22,7 +22,7 @@ module.exports = function(obj) {
             string += `**${i + 1}:** \`(deleted role, please remove this award)\`\n`
           }
         })
-        string += "\nIf you're having trouble adding a role award, you can very easily add role awards on the website at http://www.timeplayed.xyz/dashboard/"
+        string += `\nIf you're having trouble adding a role award, you can very easily manage role awards on the website at <http://www.timeplayed.xyz/dashboard/${message.guild.id}/role-awards>`
         return message.reply(string)
       } else {
         var roleIndex = Number(arg[0] - 1)
