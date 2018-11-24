@@ -4,8 +4,8 @@ module.exports = function(obj) {
     var message = obj.message;
     var handledArgs = obj.handledArgs;
     var lang = obj.lang;
-    if(message.member.hasPermission("ADMINISTRATOR")) {
-        if(Object.keys(lang.commands.setConfig.availableValues).includes(handledArgs.key)) {
+    if(message.member.hasPermission("MANAGE_GUILD")) {
+        /* if(Object.keys(lang.commands.setConfig.availableValues).includes(handledArgs.key)) {
             if(handledArgs.key == "rankingChannel" || handledArgs.key == "enableRankingMentions" || handledArgs.key == "leaderboardAmount") {
                 if(!premium) return message.reply(lang.errors.premiumOnly)
                 if(handledArgs.key == "rankingChannel") {
@@ -47,7 +47,8 @@ module.exports = function(obj) {
             availableSettings += `\`${key}\` (${type})\n`
             })
             return message.reply(lang.commands.setConfig.unknownSetting.replace("%availableSettings%", availableSettings))
-        }
+        } */
+        return message.reply(`You can edit this server's config at <http://www.timeplayed.xyz/dashboard/${message.guild.id}>`)
     } else {
         message.reply(lang.errors.noPermission)
     }

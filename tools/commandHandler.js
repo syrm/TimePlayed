@@ -59,14 +59,14 @@ module.exports = function(args, defaultGame, command) {
     if(!results.role || !results.since) results.wrongSyntax = true;
     return results;
   }
-  if(command == "setconfig") {
+  /* if(command == "setconfig") {
     var results = {wrongSyntax: false}
     if(!args[0] || !args[1]) results.wrongSyntax = true;
     results.key = args[0]
     results.value = args.slice(1).join(" ")
     results.type = typeOf(args.slice(1).join(" "))
     return results;
-  }
+  } */
   if(command == "serverstats") {
     var results = {wrongSyntax: false, gamesOnly: false, sortBy: "time"}
     var game = JSON.parse(JSON.stringify(args));

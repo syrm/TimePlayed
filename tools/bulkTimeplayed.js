@@ -56,8 +56,6 @@ module.exports =  function(guilds, sinces, callback) {
       })
       finalResults.push({guildID: guild.guildID, results: guildResults})
     })
-    
-    connection.release();
     return callback(finalResults)
   });
 }

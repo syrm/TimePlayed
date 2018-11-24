@@ -206,11 +206,12 @@
             "confirmation": "Are you 100% sure?\nThis action will **erase ALL your data** from the playtime database, and I will stop logging your playtime.\nThis action can **NOT** be undone!\nReact with ✅ to confirm this action, to cancel, ignore this message."
         },
         "setConfig": {
-            "args": "(key) (value)",
+            "args": "",
             "aliases": ["sc", "settings", "setting", "setconf"],
             "helpDescription": "Change a value of the server config",
             "category": "Admin commands",
-            "fullDescription": "This command lets you change a config value. To get a list of available options, type `%prefix%showConfig`.\nHere's an example: if I want to change the server's prefix to `?` I'd have to run the command: `%prefix%setConfig prefix ?`\nPlease note that the config keys are **case sensitive**.",
+            "fullDescriptionOld": "This command lets you change a config value. To get a list of available options, type `%prefix%showConfig`.\nHere's an example: if I want to change the server's prefix to `?` I'd have to run the command: `%prefix%setConfig prefix ?`\nPlease note that the config keys are **case sensitive**.",
+            "fullDescription": "This command gives you a link to the TimePlayed Dashboard where you can [view/edit this server's config](http://www.timeplayed.xyz/dashboard/%guildId%).",
             "PMSupport": false,
             "availableValues": {
                 "prefix": "string",

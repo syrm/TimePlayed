@@ -8,14 +8,14 @@ var connection = tools.getConnection
 
 // LEADERBOARD
 
-function checkGuildPremium(guildID) {
-  var premium = false;
-  fs.readdirSync(`./data/premiumUsers/`).forEach(file => {
-    if(fs.readFileSync(`./data/premiumUsers/${file}`) == guildID) {
-      premium = true;
-    }
+function getPremiumGuilds(callback) {
+  connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+    var premiums = [];
+    results.forEach(result => {
+      premiums.push(result.guildID)
+    })
+    return callback(premiums)
   })
-  return premium;
 }
 
 function findWithAttr(array, attr, value) {
@@ -28,158 +28,153 @@ function findWithAttr(array, attr, value) {
 }
 
 function topListToString(topLists, guildConf, guildID) {
-  function sinceBoard(sinceString, since) {
-    var string = `**----------------- ${sinceString} -----------------**\n`
-    var topList;
-    var emptyString;
-    var noMoreString;
-    if(since == "7d") {
-      topList = topLists[0];
-      emptyString = `No one played ${guildConf.defaultGame} this week!`
-      noMoreString = `No more users played ${guildConf.defaultGame} this week!`
-      var d = new Date();
-      d.setDate(d.getDate()-7);
-      if(guild.joinedAt > d) {
-        return `${string}I joined this server less than a week ago, so this leaderboard would be the same as the "Always" leaderboard. Go check out that one!`
-      }
-    }
-    if(since == "today") {
-      topList = topLists[1];
-      emptyString = `No one played ${guildConf.defaultGame} today!`
-      noMoreString = `No more users played ${guildConf.defaultGame} today!`
-      var vanochtend = new Date();
-      vanochtend.setHours(6);
-      vanochtend.setMinutes(0);
-      vanochtend.setSeconds(0);
-      vanochtend.setMilliseconds(0)
-      if(guild.joinedAt > vanochtend) {
-        return `${string}I joined this server today, so this leaderboard would be the same as the "Always" leaderboard. Go check out that one!`
-      }
-    }
-    if(since == undefined || since == "") {
-      topList = topLists[2];
-      noMoreString = `No more users have ever played ${guildConf.defaultGame}!`
-      emptyString = `No one has ever played ${guildConf.defaultGame}!`
-    }
-    var l = guildConf.leaderboardAmount;
-    var amount = 0;
-    for (let i = 0; i < l; i++) {
-      if(topList[i] == undefined) {
-        break;
-      }
-      var userIndex = topList.map(function(e) { return e.id; }).indexOf(topList[i].id)
-      var userTimePlayed = topList[userIndex].minutes;
-      var userID = topList[userIndex].id;
-      var userTag
-      if(guildConf.enableRankingMentions != true) userTag = client.users.get(userID).tag
-      if(i == 0) {
-        if(userTimePlayed > 0) {
-          if(guildConf.enableRankingMentions == true) {
-            string += `1. <@${userID}> 👑 *- ${tools.convert.timeToString(userTimePlayed * 60000)}*\n`;
-            amount++;
-          } else {
-            string += `1. **${userTag}** 👑 *- ${tools.convert.timeToString(userTimePlayed * 60000)}*\n`;
-            amount++;
-          }
-        }
-      } else {
-        if(userTimePlayed > 0) {
-          if(guildConf.enableRankingMentions == true) {
-            string += `${i + 1}. <@${userID}> *- ${tools.convert.timeToString(userTimePlayed * 60000)}*\n`;
-            amount++;
-          } else {
-            string += `${i + 1}. **${userTag}** *- ${tools.convert.timeToString(userTimePlayed * 60000)}*\n`;
-            amount++;
-          }
-        }
-      }
-    }
-    if(amount < guildConf.leaderboardAmount) {
-      if(amount == 0) {
-        string += emptyString;
-      } else {
-      string += noMoreString;
-      }
-    }
-    return string;
-  }
   var guild = client.guilds.get(guildID)
-  var realityWarning = `*Please realize that this information is based on Discord presences and it can deviate from reality.*`
-  return `*${guild.name}'s* \`${guildConf.defaultGame}\` leaderboard:\n${sinceBoard("WEEKLY", "7d")}\n${sinceBoard("TODAY", "today")}\n${sinceBoard("ALWAYS*", undefined)}\n**------------------------------------------------**\nLast updated at: \`${Date().toString()}\`\n*I joined this server \`${tools.convert.timeDifference(guild.joinedAt)}\`, the times I started measuring your playtime can vary per user.\n\n${realityWarning}`
+  var layout = guildConf.leaderboardLayout;
+  var toReplace = [
+    ["%serverName%", guild.name],
+    ["%game%", guildConf.defaultGame],
+    ["%updatedAt%", Date().toString()],
+    ["%joinedAt%", guild.joinedAt],
+    ["%joinedAgo%", tools.convert.timeDifference(guild.joinedAt)]
+  ];
+  var sinces = ["weekly", "daily", "always"];
+  var amount = 5;
+  var lines = layout.split("\n")
+  var deleted = [];
+  function replaceLayout(lines, toReplace, replacement) {
+    lines.forEach((line, lineIndex) => {
+      lines[lineIndex] = line.replace(toReplace, replacement)
+    })
+    return lines;
+  }
+  sinces.forEach((since, sinceIndex) => {
+    for(i = 0; i < amount; i++) {
+      var num = i + 1;
+      var obj = topLists[sinceIndex][i];
+      var mins = 0;
+      var user;
+      if(obj) {
+        mins = obj.minutes
+        user = client.users.get(obj.id)
+      }
+      if(obj && user && mins > 1) {
+        lines = replaceLayout(lines, `%${since}${num}-name%`, user.username)
+        lines = replaceLayout(lines, `%${since}${num}-tag%`, user.discriminator)
+        lines = replaceLayout(lines, `%${since}${num}-mention%`, `<@${user.id}>`)
+        lines = replaceLayout(lines, `%${since}${num}-time%`, tools.convert.timeToString(mins))
+      } else {
+        var vars = ["name", "tag", "mention", "time"];
+        var done = [];
+        lines.forEach((line, lineIndex) => {
+          vars.forEach(name => {
+            if(line.includes(`%${since}${num}-${name}%`)) {
+              deleted.push({lineIndex: lineIndex, place: num, since: since})
+              done.push(lineIndex);
+              lines[lineIndex] = "";
+            }
+          })
+        })
+      }
+    }
+  })
+  
+  var lowestReplacements = {}
+  sinces.forEach(since => {
+    lowestReplacements[since] = deleted.filter(e => e.since == since).map(e => e.place).sort((a, b) => a-b)[0]
+  })
 
+  Object.keys(lowestReplacements).forEach(since => {
+    var place = lowestReplacements[since];
+    var lineIndex = deleted.filter(e => e.since == since && e.place == place)[0].lineIndex
+    if(place == 1) {
+      var replacement;
+      if(since == "daily") replacement = guildConf.leaderboardNoToday
+      if(since == "weekly") replacement = guildConf.leaderboardNoWeek
+      if(since == "always") replacement = guildConf.leaderboardNoAlways
+      lines[lineIndex] = replacement.replace("%game%", guildConf.defaultGame);
+    } else {
+      var replacement;
+      if(since == "daily") replacement = guildConf.leaderboardNoMoreToday
+      if(since == "weekly") replacement = guildConf.leaderboardNoMoreWeek
+      if(since == "always") replacement = guildConf.leaderboardNoMoreAlways
+      lines[lineIndex] = replacement.replace("%game%", guildConf.defaultGame);
+    }
+  })
+
+  layout = lines.filter(e => e != "").join("\n");
+  
+  toReplace.forEach(arr => {
+    layout = layout.replace(arr[0], arr[1])
+  })
+
+  return layout;
 }
 
-function updateRankingChannel(callback) {
+function updateRankingChannel() {
   console.log("Updating ranking channels...")
   var guilds = [];
+  var ids = []
+  client.guilds.forEach(guild => {
+    ids.push(guild.id)
+  })
+  console.log(ids);
   tools.getGuildConfigs(function(configs) {
-    client.guilds.forEach(function(guild, index) {
-      var i = configs.map(e => {return e.guildID}).indexOf(guild.id)
-      if(i < 0) return;
-      var guildConf = configs[i].config;
-      if(!guildConf.rankingChannel) return;
-      var rankingChannel = guild.channels.get(guildConf.rankingChannel);
-      var premium = checkGuildPremium(guild.id)
-      if(rankingChannel && premium == true) {
-        // Permission check
-        if(guild.me.permissionsIn(rankingChannel).has("VIEW_CHANNEL") == false) return console.log(`No permissions to read messages in ranking channel, aborting (server: ${guild.name})`);
-        if(guild.me.permissionsIn(rankingChannel).has("SEND_MESSAGES") == false) return console.log(`No permissions to send messages in ranking channel, aborting (server: ${guild.name})`);
-        if(guild.me.permissionsIn(rankingChannel).has("MANAGE_MESSAGES") == false) return console.log(`No permissions to manage messages in ranking channel, aborting (server: ${guild.name})`);
-        var idList = []
-        guild.members.forEach(member => {
-          idList.push(member.id)
-        })
-        guilds.push({guildID: guild.id, game: guildConf.defaultGame, ids: idList})
-      }
-    })
-  
-    tools.bulkTimeplayed(guilds, ["7d", "today", undefined], function(results) {
-      client.guilds.forEach(guild => {
+    getPremiumGuilds(function(premiums) {
+      client.guilds.forEach(function(guild, index) {
         var i = configs.map(e => {return e.guildID}).indexOf(guild.id)
         if(i < 0) return;
         var guildConf = configs[i].config;
+        if(!guildConf.rankingChannel) return;
         var rankingChannel = guild.channels.get(guildConf.rankingChannel);
-        var premium = checkGuildPremium(guild.id)
-        if(premium && rankingChannel) {
-          if(guild.me.permissionsIn(rankingChannel).has("VIEW_CHANNEL") == false) return console.log(`No permissions to read messages in ranking channel, aborting (server: ${guild.name})`);
-          if(guild.me.permissionsIn(rankingChannel).has("SEND_MESSAGES") == false) return console.log(`No permissions to send messages in ranking channel, aborting (server: ${guild.name})`);
-          if(guild.me.permissionsIn(rankingChannel).has("MANAGE_MESSAGES") == false) return console.log(`No permissions to manage messages in ranking channel, aborting (server: ${guild.name})`);
-          var index = findWithAttr(results, 'guildID', guild.id)
-          if(index != -1) {
-            var topLists = results[index].results
-            for(var i = 0; i < topLists.length; i++) {
-              topLists[i].sort(function(a,b) {return b.minutes - a.minutes})
-            }
-  
-            fetchBotMessages(20, rankingChannel)
-              .then((message) => {
-              if(message == undefined) {
-                purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
-                rankingChannel.send(topListToString(topLists, guildConf, guild.id))
-                console.log(`${Date()}: ${guild.name} leaderboard sent!`)
-              } else {
-                message.edit(topListToString(topLists, guildConf, guild.id))
-                console.log(`${Date()}: ${guild.name} leaderboard edited!`)
-                purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
-              }
-            })
-            .catch((err) => {
-              console.log("Error calculating leaderboard: \n" + err)
-            })
-          if(!fs.existsSync(`./data/cache/${guild.id}`)) {
-            fs.mkdirSync(`./data/cache/${guild.id}`)
-          }
-          fs.writeFileSync(`./data/cache/${guild.id}/weekly.json`, JSON.stringify(topLists[0]))
-          fs.writeFileSync(`./data/cache/${guild.id}/daily.json`, JSON.stringify(topLists[1]))
-          fs.writeFileSync(`./data/cache/${guild.id}/always.json`, JSON.stringify(topLists[2]))
-          fs.writeFileSync(`./data/cache/${guild.id}/date.txt`, Date())
-          }
+        var premium = premiums.includes(guild.id);
+        if(rankingChannel && premium == true) {
+          // Permission check
+          if(!guild.me.permissionsIn(rankingChannel).has(["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES"])) return console.log("No sufficient permissions for ranking channel!");
+          var idList = []
+          guild.members.forEach(member => {
+            idList.push(member.id)
+          })
+          guilds.push({guildID: guild.id, game: guildConf.defaultGame, ids: idList})
         }
       })
-      if(callback) callback();
+    
+      tools.bulkTimeplayed(guilds, ["7d", "today", undefined], function(results) {
+        client.guilds.forEach(guild => {
+          var i = configs.map(e => {return e.guildID}).indexOf(guild.id)
+          if(i < 0) return;
+          var guildConf = configs[i].config;
+          var rankingChannel = guild.channels.get(guildConf.rankingChannel);
+          var premium = premiums.includes(guild.id);
+          if(premium && rankingChannel) {
+            if(!guild.me.permissionsIn(rankingChannel).has(["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES"])) return console.log("No sufficient permissions for ranking channel!");
+            var index = findWithAttr(results, 'guildID', guild.id)
+            if(index != -1) {
+              var topLists = results[index].results
+              for(var i = 0; i < topLists.length; i++) {
+                topLists[i].sort(function(a,b) {return b.minutes - a.minutes})
+              }
+              guild.channels.get("496360607751077918").send(topListToString(topLists, guildConf, guild.id));
+              fetchBotMessages(20, rankingChannel)
+                .then((message) => {
+                if(message == undefined) {
+                  purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
+                  rankingChannel.send(topListToString(topLists, guildConf, guild.id))
+                  console.log(`${Date()}: ${guild.name} leaderboard sent!`)
+                } else {
+                  message.edit(topListToString(topLists, guildConf, guild.id))
+                  console.log(`${Date()}: ${guild.name} leaderboard edited!`)
+                  purge(50, rankingChannel).catch(err => {console.log("Error purging rankingChannel!\n" + err)})
+                }
+              })
+              .catch((err) => {
+                console.log("Error calculating leaderboard: \n" + err)
+              })
+            }
+          }
+        })
+      })
     })
   })
-  
 }
 
 
@@ -281,11 +276,8 @@ client.on("ready", () => {
   console.log("Ready!")
   updateRoles()
   setInterval(updateRoles, 60000);
-  /* updateRankingChannel(function() {
-    setInterval(updateRankingChannel, 180000);
-    updateRoles()
-    setInterval(updateRoles, 300000)
-  }) */
+  updateRankingChannel();
+  setInterval(updateRankingChannel, 180000);
 })
 
 client.login(token)

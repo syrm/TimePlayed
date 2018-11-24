@@ -1,32 +1,6 @@
 var connection = require('./connection.js');
 var fs = require("fs");
 
-module.exports = function(callback, onlyRoleAwards) {
-  connection.query("SELECT prefix, rankingChannel, enableRankingMentions, defaultGame, leaderboardAmount, roleAwards FROM guildSettings", function(error, results, fields) {
-    var configs = []
-    results.forEach(result => {
-      var enableRankingMentions = false;
-      if(result.enableRankingMentions == 1) enableRankingMentions = true;
-      if(onlyRoleAwards && result.roleAwards == "[]") return;
-      configs.push({
-        guildID: result.guildID,
-        config: {
-          prefix: result.prefix,
-          rankingChannel: result.rankingChannel,
-          enableRankingMentions: enableRankingMentions,
-          defaultGame: result.defaultGame,
-          leaderboardAmount: result.leaderboardAmount,
-          roleAwards: JSON.parse(result.roleAwards)
-        }
-      })
-    })
-    callback(configs)
-  })
-}
-
-// -------------- BETA --------------
-
-
 var defaultValues = {
   prefix: "!!",
   defaultGame: "Fortnite",
@@ -64,7 +38,7 @@ function toConfig(result) {
   return config;
 }
 
-module.exports.beta = function(callback) {
+module.exports = function(callback) {
   connection.query("SELECT * FROM guildSettings WHERE guildID=433531223244013572", function(error, results, fields) {
     var configs = []
     results.forEach(result => {
