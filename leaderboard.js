@@ -126,9 +126,7 @@ function updateRankingChannel() {
         if(!guildConf.rankingChannel) return;
         var rankingChannel = guild.channels.get(guildConf.rankingChannel);
         var premium = premiums.includes(guild.id);
-        if(rankingChannel && premium == true) {
-          // Permission check
-          if(!guild.me.permissionsIn(rankingChannel).has(["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES"])) return console.log("No sufficient permissions for ranking channel!");
+        if(rankingChannel && premium) {
           var idList = []
           guild.members.forEach(member => {
             idList.push(member.id)
@@ -145,27 +143,22 @@ function updateRankingChannel() {
           var rankingChannel = guild.channels.get(guildConf.rankingChannel);
           var premium = premiums.includes(guild.id);
           if(premium && rankingChannel) {
-            if(!guild.me.permissionsIn(rankingChannel).has(["VIEW_CHANNEL", "SEND_MESSAGES", "MANAGE_MESSAGES"])) return console.log("No sufficient permissions for ranking channel!");
             var index = findWithAttr(results, 'guildID', guild.id)
             if(index != -1) {
               var topLists = results[index].results
               for(var i = 0; i < topLists.length; i++) {
                 topLists[i].sort(function(a,b) {return b.minutes - a.minutes})
               }
-              guild.channels.get("496360607751077918").send(topListToString(topLists, guildConf, guild.id));
               fetchBotMessages(20, rankingChannel)
-                .then((message) => {
-                if(message == undefined) {
-                  rankingChannel.send(topListToString(topLists, guildConf, guild.id))
-                  console.log(`${Date()}: ${guild.name} leaderboard sent!`)
-                } else {
-                  message.edit(topListToString(topLists, guildConf, guild.id))
-                  console.log(`${Date()}: ${guild.name} leaderboard edited!`)
-                }
-              })
-              .catch((err) => {
-                console.log("Error calculating leaderboard: \n" + err)
-              })
+                .then(message => {
+                  if(!message) {
+                    rankingChannel.send(topListToString(topLists, guildConf, guild.id))
+                    console.log(`${Date()}: ${guild.name} leaderboard sent!`)
+                  } else {
+                    message.edit(topListToString(topLists, guildConf, guild.id))
+                    console.log(`${Date()}: ${guild.name} leaderboard edited!`)
+                  }
+                })
             }
           }
         })
