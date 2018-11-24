@@ -197,7 +197,7 @@ async function purge(purgeLimit, channel) {
   if(fetched.first()) {
     // Filteren
     fetched = fetched.filter(currentMSG => currentMSG.author.id != client.user.id);
-    channel.bulkDelete(fetched)
+    channel.bulkDelete(fetched).catch(err => {console.log(err)})
   }
   fetched = fetched.filter(function (msg) {return msg.author.id == "423433861167579136"});
 }
