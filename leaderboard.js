@@ -267,7 +267,7 @@ client.on("ready", () => {
   updateRoles()
   setInterval(updateRoles, 60000);
   updateRankingChannel();
-  setInterval(updateRankingChannel, 180000);
+  setInterval(updateRankingChannel, 60000);
 })
 
 client.login(token)
