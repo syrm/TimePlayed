@@ -39,7 +39,7 @@ function toConfig(result) {
 }
 
 module.exports = function(callback) {
-  connection.query("SELECT * FROM guildSettings WHERE guildID=433531223244013572", function(error, results, fields) {
+  connection.query("SELECT * FROM guildSettings", function(error, results, fields) {
     var configs = []
     results.forEach(result => {
       configs.push({
