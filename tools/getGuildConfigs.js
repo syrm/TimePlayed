@@ -2,7 +2,7 @@ var connection = require('./connection.js');
 var fs = require("fs");
 
 var defaultValues = {
-  leaderboardLayout: fs.readFileSync("./tools/assets/default-leaderboard.txt"),
+  leaderboardLayout: fs.readFileSync("./tools/assets/default-leaderboard.txt", "utf8"),
   leaderboardNoMoreToday: "No more users have played %game% today!",
   leaderboardNoMoreWeek: "No more users have played %game% this week!",
   leaderboardNoMoreAlways: "No more users have ever played %game%!",
