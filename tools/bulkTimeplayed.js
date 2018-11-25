@@ -32,7 +32,7 @@ module.exports =  function(guilds, sinces, callback) {
               value.endDate = new Date()
             }
           }
-          if(value.game.toLowerCase() != guild.game.toLowerCase() || guild.ids.includes(value.userID) == false) return;
+          if(value.game.toLowerCase() != guild.game.toLowerCase() || !guild.ids.includes(value.userID)) return;
           var msCount = 0;
           if(since == undefined) {
             msCount += Math.abs(value.endDate.getTime() - value.startDate.getTime());

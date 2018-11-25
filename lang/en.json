@@ -81,9 +81,9 @@
             "category": "Playtime commands",
             "fullDescription": "This command gives you a list of people who are playing a game in the server you run this command in. To avoid insanity in big servers, if more than 20 users are playing the game, I will only show you the first 20. If you specify no game, the server's default game will be taken.",
             "PMSupport": false,
-            "noOne": "In this server, nobody is playing %game%, you'll have to play with yourself :rolling_eyes:\n",
-            "one": "**In this server, one person is playing %game%:**\n",
-            "more": "In this server, **%count% people are playing %game%:**\n",
+            "noOne": "In this server, nobody is currently playing %game%, you'll have to play with yourself :rolling_eyes:\n",
+            "one": "**In this server, one person is currently playing %game%:**\n",
+            "more": "In this server, **%count% people are currently playing %game%:**\n",
             "moreThanTwenty": "**And %more% more people, but that would be too many to count!**"
         },
         "afk": {
