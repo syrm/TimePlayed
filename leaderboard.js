@@ -85,7 +85,12 @@ function topListToString(topLists, guildConf, guildID) {
 
   Object.keys(lowestReplacements).forEach(since => {
     var place = lowestReplacements[since];
-    var lineIndex = deleted.filter(e => e.since == since && e.place == place)[0].lineIndex
+    var lineIndex = deleted.filter(e => e.since == since && e.place == place)[0]
+    if(lineIndex != undefined) {
+      lineIndex = lineIndex.lineIndex
+    } else {
+      return;
+    }
     if(place == 1) {
       var replacement;
       if(since == "daily") replacement = guildConf.leaderboardNoToday
