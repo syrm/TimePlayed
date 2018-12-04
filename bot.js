@@ -314,6 +314,7 @@ client.on("message", message => {
     
         // Get the start date of the user
         tools.getStartDate(id, function(startDate) {
+          console.log(startDate);
           lang = tools.replaceLang(/%startDateString%+/g, tools.convert.timeDifference(startDate, new Date(), true), lang)
             var meantUser = message.author;
             if(mention) meantUser = mention;
