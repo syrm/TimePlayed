@@ -135,7 +135,7 @@ client.on("ready", () => {
 });
 
 client.on("guildMemberRemove", member => {
-  connection.query(`SELECT userID FROM startDates WHERE userID = ${member.id}`, function(err, results, fields) {
+  connection.query(`SELECT userID FROM termsAccept WHERE userID = ?`, [member.id], function(err, results, fields) {
     if(err) throw err;
     if(results.length > 0) {
       var found = false;
@@ -145,8 +145,7 @@ client.on("guildMemberRemove", member => {
         })
       })
       if(!found) {
-        connection.query(`DELETE FROM startDates WHERE userID=${member.id}`, function(err) {
-          if(err) throw err;
+        connection.query(`DELETE FROM termsAccept WHERE userID = ?`, [member.id], function(err) {
           console.log(`Stopped logging playtime for user (${member.user.tag}), deleted from start date table`)
         });
       }

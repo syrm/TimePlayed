@@ -11,7 +11,7 @@ module.exports = function(obj) {
             loadingMSG.edit(`${lang.general.loadingMessage} Deleting your last online data...`)
             connection.query(`DELETE FROM lastOnline WHERE userID=?`, [message.author.id], function(error, results, fields) {
               loadingMSG.edit(`${lang.general.loadingMessage} Deleting your start date...`)
-              connection.query(`DELETE FROM startDates WHERE userID=?`, [message.author.id], function(error, results, fields) {
+              connection.query(`DELETE FROM termsAccept WHERE userID=?`, [message.author.id], function(error, results, fields) {
                 loadingMSG.edit("Done! All your data is now completely erased.")
               })
             })
