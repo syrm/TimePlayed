@@ -297,7 +297,7 @@ client.on("message", message => {
         if(message.guild && message.guild.me.permissionsIn(message.channel).has("ADD_REACTIONS")) reactPerms = true;
         var methodMessage = lang.errors.commandMessage
         if(reactPerms) methodMessage = lang.errors.reactionMessage
-        if(termsMSG) return message.channel.send(termsMSG + methodMessage + lang.errors.acceptMessageSuffix).then(msg => {
+        if(termsMSG) return message.channel.send(termsMSG + lang.errors.acceptMessageSuffix + methodMessage).then(msg => {
           if(!reactPerms) return;
           tools.awaitReaction(msg, ["✅"], undefined, function(emoji, index, user) {
             tools.setTerms(user.id, true, function() {

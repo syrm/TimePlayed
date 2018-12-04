@@ -13,12 +13,12 @@
         "helpCommandNotFound": "I can't find the full description of the command you specified! Type `%prefix%help` to get a list of all my commands.",
         "noPermission": "Sorry, you need the `administrator` permission in this server to do that!.",
         "tooMuchSince": "Please make the custom since not more than a 2 digit number! I can't handle more!",
-        "firstTime": "Hi there! I see it's the first time you're using me.\nBecause I collect privacy sensitive information from you, I need you to accept to the terms of service.",
-        "stillAccept": "Hi there! I see you have previously declined my terms of service, so to use my commands please still accept them.",
+        "firstTime": "Hi there! I see it's the first time you're using me.\nI'm TimePlayed, a bot that logs your playtime. I need your permission for this, so if you'd like me to log your playtime please accept to my Terms of Service.",
+        "stillAccept": "Hi there! I see you have erased your playtime data, so to use my commands please still accept them.",
         "reactionMessage": "\nReact with ✅ to accept my terms of service, ignore this message to decline.",
-        "commandMessage": "\nPlease type `%prefix%accept` to accept to my terms of service.",
-        "acceptMessageSuffix": "\nBy accepting you basically **give me the permission to log your playtime data** using your Discord presence.\nMy full Terms of Service are available at <http://www.timeplayed.xyz/terms-of-service>",
-        "mentionNoAccept": "The user you mentioned declined/didn't yet accept my terms of service, so I can't show you their playtime!\nAsk them to run any of my commands and accept to the terms of service to view their playtime."
+        "commandMessage": "\nPlease type `%prefix%accept` to accept to my Terms of Service.",
+        "acceptMessageSuffix": "\nBy accepting you **give me the permission to log your playtime data** using your Discord presence.\nMy full Terms of Service are available at <http://www.timeplayed.xyz/terms-of-service>.",
+        "mentionNoAccept": "The user you mentioned hasn't accepted my terms of service, so I can't show you their playtime!\nAsk them to run any of my commands and accept to the terms of service to view their playtime."
     },
     "general": {
         "termsAccepted": "Success! From now on, I will log your playtime, so please try out some of my commands!\nOf course I can't look back in time, so please don't expect that I already have your playtime logged, from now on I will start logging it.",
