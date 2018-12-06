@@ -312,6 +312,11 @@ client.on("message", message => {
         // If syntax of command is wrong, return and reply a message
         if(handledArgs.wrongSyntax) return wrongSyntax(message, command, lang)
     
+        // If user ran timeplayed without game, redirect to topplayed command
+        if(command == "timeplayed" && handledArgs.defaultGame == true) {
+          command = "topplayed";
+        }
+
         // Get the start date of the user
         tools.getStartDate(id, function(startDate) {
           lang = tools.replaceLang(/%startDateString%+/g, tools.convert.timeDifference(startDate, new Date(), true), lang)
