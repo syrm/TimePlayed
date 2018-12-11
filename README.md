@@ -5,4 +5,4 @@
 ![TimePlayed logo](https://image.ibb.co/ibgfhS/Time_Played_logo_50x50.png)<br>
 <h2>A customizable bot that tracks your playtime</h2>
 Source code is publicly available, so feel free to take a look.
-My full documentation can be found on <a href="https://timeplayed.xyz" target="_blank">my website</a>
+My full documentation can be found on <a href="http://timeplayed.xyz" target="_blank">my website</a>
