@@ -122,60 +122,60 @@ module.exports = function(obj) {
             } else {
               handledArgs.game = bestMatch;
             }
-          })
-          handledArgs.game = bestMatch;
-          connection.query("SELECT * FROM guildStats WHERE guildID=? AND game=?", [message.guild.id, bestMatch], function(error, results, fields) {
-            var numUsers = [];
-            results.forEach(result => {
-              if(!numUsers.includes(result.userID)) numUsers.push(result.userID)
-            })
-            numUsers = numUsers.length;
-            numUsersPercent = Math.round(numUsers / message.guild.members.size * 100 * 100) / 100
-            function tp(since, ignoreErrors) {
-              var time = 0;
-              since = tools.convert.sinceDate(since);
-              if(since < startLogging && !ignoreErrors) return undefined;
-              results.forEach((result, i) => {
-                if(!result.endDate) {
-                  if(i != results.length - 1) {
-                    return;
-                  } else {
-                    result.endDate = new Date()
-                  }
-                }
-                var diffMS = 0;
-                if(result.endDate > since) {
-                  if(result.startDate < since) {
-                    diffMS = Math.abs(result.endDate.getTime() - since.getTime())
-                  }
-                  if(result.startDate > since) {
-                    diffMS = Math.abs(result.endDate.getTime() - result.startDate.getTime());
-                  }
-                }
-                if(diffMS < 1) return;
-                time += Math.floor(diffMS / 1000);
+            connection.query("SELECT * FROM guildStats WHERE guildID=? AND game=?", [message.guild.id, handledArgs.game], function(error, results, fields) {
+              var numUsers = [];
+              results.forEach(result => {
+                if(!numUsers.includes(result.userID)) numUsers.push(result.userID)
               })
-              return time;
-            }
-            var tpWeek = tp("7d")
-            var tpMonth = tp("30d")
-            var tpTotal = tp("total", true)
-            function tts(num, days) {
-              if(!num && days == 7) return "Can't show, playtime started measuring after a week ago!";
-              if(!num && days == 30) return "Can't show, playtime started measuring after a month ago!";
-              return `*${tools.convert.timeToString(num)}*\nAverage per day: *${tools.convert.timeToString(num / days)}*`;
-            }
-            const embed = new Discord.RichEmbed()
-              .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
-              .setColor(3447003)
-              .setDescription(`Welcome to \`${message.guild.name}\`'s \`${handledArgs.game}\` statistics.`)
-              .addField(`Amount of users who ever played ${handledArgs.game}`, `**${numUsers}** (${numUsersPercent}% of all server members)`, true)
-              .addField(`Average playtime per user per day`, `Including users who never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / numUsers)}*`)
-              .addField("Weekly time played", tts(tpWeek, 7))
-              .addField("Monthly time played", tts(tpMonth, 30))
-              .addField("Total time played", tts(tpTotal, numDays))
-            return msg.edit(embed);
+              numUsers = numUsers.length;
+              numUsersPercent = Math.round(numUsers / message.guild.members.size * 100 * 100) / 100
+              function tp(since, ignoreErrors) {
+                var time = 0;
+                since = tools.convert.sinceDate(since);
+                if(since < startLogging && !ignoreErrors) return undefined;
+                results.forEach((result, i) => {
+                  if(!result.endDate) {
+                    if(i != results.length - 1) {
+                      return;
+                    } else {
+                      result.endDate = new Date()
+                    }
+                  }
+                  var diffMS = 0;
+                  if(result.endDate > since) {
+                    if(result.startDate < since) {
+                      diffMS = Math.abs(result.endDate.getTime() - since.getTime())
+                    }
+                    if(result.startDate > since) {
+                      diffMS = Math.abs(result.endDate.getTime() - result.startDate.getTime());
+                    }
+                  }
+                  if(diffMS < 1) return;
+                  time += Math.floor(diffMS / 1000);
+                })
+                return time;
+              }
+              var tpWeek = tp("7d")
+              var tpMonth = tp("30d")
+              var tpTotal = tp("total", true)
+              function tts(num, days) {
+                if(!num && days == 7) return "Can't show, playtime started measuring after a week ago!";
+                if(!num && days == 30) return "Can't show, playtime started measuring after a month ago!";
+                return `*${tools.convert.timeToString(num)}*\nAverage per day: *${tools.convert.timeToString(num / days)}*`;
+              }
+              const embed = new Discord.RichEmbed()
+                .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
+                .setColor(3447003)
+                .setDescription(`Welcome to \`${message.guild.name}\`'s \`${handledArgs.game}\` statistics.`)
+                .addField(`Amount of users who ever played ${handledArgs.game}`, `**${numUsers}** (${numUsersPercent}% of all server members)`, true)
+                .addField(`Average playtime per user per day`, `Including users who never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / numUsers)}*`)
+                .addField("Weekly time played", tts(tpWeek, 7))
+                .addField("Monthly time played", tts(tpMonth, 30))
+                .addField("Total time played", tts(tpTotal, numDays))
+              return msg.edit(embed);
+            })
           })
+          
         })
         
       }
