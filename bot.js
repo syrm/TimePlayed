@@ -91,7 +91,7 @@ Object.keys(en.commands).forEach(command => {
 })
 client.on("ready", () => {
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
-  log("Bot is ready")
+  log("Started up!")
   console.log(`Bot is ready!`);
   console.log(`I'm in ${client.guilds.size} guilds.`)
   postStats()
@@ -99,26 +99,6 @@ client.on("ready", () => {
   setInterval(() => {
     client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   }, 60000)
-  if(beta) return;
-  connection.query("SELECT * FROM acceptMessages", function(error, results, fields) {
-    if(error) throw error;
-    results.forEach(result => {
-      var channel = client.channels.get(result.channelID)
-      channel.fetchMessage(result.messageID).then(msg => {
-        if(!msg) {
-          connection.query("DELETE FROM acceptMessages WHERE messageID=?", [result.messageID], function(error, results, fields) {
-          })
-          return;
-        }
-        tools.acceptCollector(msg)
-      }).catch(msg => {
-        connection.query("DELETE FROM acceptMessages WHERE messageID=?", [result.messageID], function(error, results, fields) {
-        })
-      })
-    })
-    console.log("Fully started up!")
-    log("Fully started up")
-  })
 });
 
 client.on("guildCreate", guild => {
