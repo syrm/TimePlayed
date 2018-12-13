@@ -125,10 +125,12 @@ function gameUpdate(oldMember, newMember, date, afk) {
 client.on("ready", () => {
   console.log("Clearing up restart differences...");
   clearup("playtime", function() {
-    console.log("Clearup done");
-    console.log("Started logging")
-    refresh()
-    setInterval(refresh, 5000)
+    clearup("guildStats", function() {
+      console.log("Clearup done");
+      console.log("Started logging")
+      refresh()
+      setInterval(refresh, 5000)
+    })
   })
 });
 
