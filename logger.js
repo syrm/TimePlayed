@@ -146,8 +146,10 @@ client.on("guildMemberRemove", member => {
       })
       if(!found) {
         connection.query(`DELETE FROM termsAccept WHERE userID = ?`, [member.id], function(err) {
-          console.log(`Stopped logging playtime for user (${member.user.tag}), deleted from start date table`)
-        });
+          connection.query(`DELETE FROM loggedUsers WHERE userID = ?`, [member.id], function(err) {
+            console.log(`Stopped logging playtime for user (${member.user.tag}), deleted from start date table`)
+          })
+        })
       }
     }
   });
