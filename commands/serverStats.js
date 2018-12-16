@@ -1,7 +1,89 @@
 var tools = require("../tools")
 const Discord = require("discord.js")
 var levenshtein = require('fast-levenshtein');
-var connection = tools.getConnection
+
+var mysql = require('mysql');
+const keys = require('../keys.json')
+var connection = mysql.createPool({
+    connectionLimit : 3,
+    host: keys.mysqlhost,
+    user: keys.mysqlusername,
+    password: keys.mysqlpasswd,
+    database: 'timeplayed',
+    supportBigNumbers: true,
+    charset: 'utf8mb4',
+    multipleStatements: true
+});
+
+var q = `
+SELECT
+	game,
+    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+    COUNT(DISTINCT userID) AS count
+FROM
+    guildStats
+WHERE
+    guildID = ?
+    %gamesOnly%
+GROUP BY game
+ORDER BY %orderBy% DESC
+LIMIT 5;
+
+SELECT
+	game,
+    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+    COUNT(DISTINCT userID) AS count
+FROM
+    guildStats
+WHERE
+    guildID = ?
+    AND startDate > NOW() - INTERVAL 1 WEEK
+    %gamesOnly%
+GROUP BY game
+ORDER BY %orderBy% DESC
+LIMIT 5;
+
+SELECT
+	game,
+    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+    COUNT(DISTINCT userID) AS count
+FROM
+    guildStats
+WHERE
+    guildID = ?
+    AND startDate > NOW() - INTERVAL 30 DAY
+    %gamesOnly%
+GROUP BY game
+ORDER BY %orderBy% DESC
+LIMIT 5;
+
+SELECT
+  SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time
+FROM
+  guildStats
+WHERE
+    guildID = ?
+    %gamesOnly%`
+
+var qTP = `
+SELECT
+    SUM(IF(
+        startDate > NOW() - INTERVAL 1 WEEK,
+        TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
+        0)) AS week,
+    SUM(IF(
+		    startDate > NOW() - INTERVAL 30 DAY,
+        TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
+        0)) AS month,
+	  SUM(
+		    TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))
+        ) AS total,
+    COUNT(DISTINCT userID) AS count
+FROM
+    guildStats
+WHERE
+    guildID = ?
+    AND game = ?`
 
 module.exports = function(obj) {
   var message = obj.message;
@@ -15,87 +97,44 @@ module.exports = function(obj) {
       var oneDay = 24*60*60*1000;
       var numDays = Math.ceil(Math.abs((startLogging.getTime() - now.getTime())/(oneDay)));
       if(!handledArgs.game) {
-        connection.query("SELECT * FROM guildStats WHERE guildID=?", [message.guild.id], function(error, results, fields) {
-          connection.query("SELECT game, type FROM gameIcons", function(error, gameTypes, fields) {
-            var software = gameTypes.map(e => {if(e.type == 1) return e.game}).filter(e => {return e != undefined});
-            if(results.length < 1) return msg.edit(`It seems like no one in this server ever played any game! This might be because I just started logging everyone's playtime in this server, so please try again later.`)
-            const embed = new Discord.RichEmbed()
-            .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
-            .setColor(3447003)
-            .setDescription(`Welcome to \`${message.guild.name}\`'s full statistics.`)
-            function topGames(since, ignoreErrors) {
-              since = tools.convert.sinceDate(since);
-              if(since < startLogging && !ignoreErrors) return undefined;
-              var games = [];
-              results.forEach(function(result, i) {
-                if(software.includes(result.game)) return;
-                if(!result.endDate) {
-                  if(i != results.length - 1) {
-                    return;
-                  } else {
-                    result.endDate = new Date()
-                  }
-                }
-                var diffMS = 0;
-                if(result.endDate > since) {
-                  if(result.startDate < since) {
-                    diffMS = Math.abs(result.endDate.getTime() - since.getTime())
-                  }
-                  if(result.startDate > since) {
-                    diffMS = Math.abs(result.endDate.getTime() - result.startDate.getTime());
-                  }
-                }
-                if(diffMS < 1) return;
-                if(games.some(e => e.game == result.game)) {
-                    var index = games.map(e => {return e.game}).indexOf(result.game);
-                    games[index].time += Math.floor(diffMS / 1000);
-                } else {
-                    var users = [];
-                    results.forEach(e => {
-                      if(e.game == result.game && !users.includes(e.userID)) users.push(e.userID);
-                    })
-                    games.push({game: result.game, time: Math.floor(diffMS / 1000), users: users.length})
-                }
-              })
-              if(handledArgs.sortBy == "count") {
-                games.sort(function(a, b){return b.users-a.users});
-              } else {
-                games.sort(function(a, b){return b.time-a.time});
-              }
-              
-              return games;
-            }
-            function topListToString(list, days) {
-              if(!list && days == 7) return "Can't show, playtime started measuring after a week ago!";
-              if(!list && days == 30) return "Can't show, playtime started measuring after a month ago!";
-              if(!list) return "No playtime logged (yet)!"
-              if(list.length < 1) return "Nothing to show!";
-              var str = "";
-              list.forEach((obj, i) => {
-                if(i > 4) return;
-                var newLine = "\n";
-                if(i == list.length - 1) newLine = "";
-                var s = "";
-                if(obj.users > 1) s = "s";
-                str += `**${i + 1}. ${obj.game}** (${obj.users} player${s})\n*${tools.convert.timeToString(obj.time)}*\nAverage per day: *${tools.convert.timeToString(obj.time / days)}*${newLine}`;
-              })
-              return str;
-            }
-            var topWeek = topGames("7d");
-            var topMonth = topGames("30d");
-            var topAlways = topGames("always", true);
-            embed.addField("Total played games", topAlways.length, true);
-            var totalTime = 0;
-            topAlways.forEach(obj => {
-              totalTime += obj.time;
+        if(handledArgs.gamesOnly) {
+          q = q.replace(/%gamesOnly%/g, 'AND game NOT IN (SELECT game FROM knownGames WHERE type=2)')
+        } else {
+          q = q.replace(/%gamesOnly%/g, '')
+        }
+        if(handledArgs.sortBy == 'count') {
+          q = q.replace(/%orderBy%/g, 'count')
+        } else {
+          q = q.replace(/%orderBy%/g, 'time')
+        }
+        connection.query(q, [message.guild.id, message.guild.id, message.guild.id, message.guild.id], function(error, results, fields) {
+          if(results.length < 1) return msg.edit(`It seems like no one in this server ever played any game! This might be because I just started logging everyone's playtime in this server, so please try again later.`)
+          const embed = new Discord.RichEmbed()
+          .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
+          .setColor(3447003)
+          .setDescription(`Welcome to \`${message.guild.name}\`'s full statistics.`)
+
+          function topListToString(list, days) {
+            if(list.length < 1) return "No playtime in the period logged yet!";
+            var str = "";
+            list.forEach((obj, i) => {
+              var newLine = "\n";
+              if(i == list.length - 1) newLine = "";
+              var s = "";
+              if(obj.count > 1) s = "s";
+              str += `**${i + 1}. ${obj.game}** (${obj.count} player${s})\n*${tools.convert.timeToString(obj.time)}*\nAverage per day: *${tools.convert.timeToString(obj.time / days)}*${newLine}`;
             })
-            embed.addField("Total time any games played", tools.convert.timeToString(totalTime), true);
-            embed.addField("Average daily gaming time per user", tools.convert.timeToString(totalTime / numDays / message.guild.members.size), true);
-            embed.addField("Weekly top played games", topListToString(topWeek, 7))
-            embed.addField("Monthly top played games", topListToString(topMonth, 30))
-            embed.addField("Total top played games", topListToString(topAlways, numDays))
-            return msg.edit(embed);
-          })
+            return str;
+          }
+          embed.addField("Total played games", results[0].length, true);
+          var totalTime = results[3][0].time;
+          
+          embed.addField("Total time any games played", tools.convert.timeToString(totalTime), true);
+          embed.addField("Average daily gaming time per user", tools.convert.timeToString(totalTime / numDays / message.guild.members.size), true);
+          embed.addField("Weekly top played games", topListToString(results[2], 7))
+          embed.addField("Monthly top played games", topListToString(results[1], 30))
+          embed.addField("Total top played games", topListToString(results[0], numDays))
+          return msg.edit(embed);
           
         })
       } else {
@@ -122,62 +161,25 @@ module.exports = function(obj) {
             } else {
               handledArgs.game = bestMatch;
             }
-            connection.query("SELECT * FROM guildStats WHERE guildID=? AND game=?", [message.guild.id, handledArgs.game], function(error, results, fields) {
-              var numUsers = [];
-              results.forEach(result => {
-                if(!numUsers.includes(result.userID)) numUsers.push(result.userID)
-              })
-              numUsers = numUsers.length;
+            connection.query(qTP, [message.guild.id, handledArgs.game], function(error, results, fields) {
+              numUsers = results[0].count
               numUsersPercent = Math.round(numUsers / message.guild.members.size * 100 * 100) / 100
-              function tp(since, ignoreErrors) {
-                var time = 0;
-                since = tools.convert.sinceDate(since);
-                if(since < startLogging && !ignoreErrors) return undefined;
-                results.forEach((result, i) => {
-                  if(!result.endDate) {
-                    if(i != results.length - 1) {
-                      return;
-                    } else {
-                      result.endDate = new Date()
-                    }
-                  }
-                  var diffMS = 0;
-                  if(result.endDate > since) {
-                    if(result.startDate < since) {
-                      diffMS = Math.abs(result.endDate.getTime() - since.getTime())
-                    }
-                    if(result.startDate > since) {
-                      diffMS = Math.abs(result.endDate.getTime() - result.startDate.getTime());
-                    }
-                  }
-                  if(diffMS < 1) return;
-                  time += Math.floor(diffMS / 1000);
-                })
-                return time;
-              }
-              var tpWeek = tp("7d")
-              var tpMonth = tp("30d")
-              var tpTotal = tp("total", true)
-              function tts(num, days) {
-                if(!num && days == 7) return "Can't show, playtime started measuring after a week ago!";
-                if(!num && days == 30) return "Can't show, playtime started measuring after a month ago!";
-                return `*${tools.convert.timeToString(num)}*\nAverage per day: *${tools.convert.timeToString(num / days)}*`;
+              function tts(num, days) {;
+                return `*${tools.convert.timeToString(num)}*\nTotal average per day: *${tools.convert.timeToString(num / days)}*`;
               }
               const embed = new Discord.RichEmbed()
                 .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
                 .setColor(3447003)
                 .setDescription(`Welcome to \`${message.guild.name}\`'s \`${handledArgs.game}\` statistics.`)
                 .addField(`Amount of users who ever played ${handledArgs.game}`, `**${numUsers}** (${numUsersPercent}% of all server members)`, true)
-                .addField(`Average playtime per user per day`, `Including users who never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(tpTotal / numDays / numUsers)}*`)
-                .addField("Weekly time played", tts(tpWeek, 7))
-                .addField("Monthly time played", tts(tpMonth, 30))
-                .addField("Total time played", tts(tpTotal, numDays))
+                .addField(`Average playtime per user per day`, `Including users who never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(results[0].total / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(results[0].total / numDays / numUsers)}*`)
+                .addField("Weekly time played", tts(results[0].week, 7))
+                .addField("Monthly time played", tts(results[0].month, 30))
+                .addField("Total time played", tts(results[0].total, numDays))
               return msg.edit(embed);
             })
           })
-          
         })
-        
       }
     })
   })

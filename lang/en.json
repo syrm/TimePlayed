@@ -54,7 +54,7 @@
             "day": "Today, %person% %have% played `%timePlayedDay%` %game%",
             "dayNoInfo": "%possessiveUpper% data %have% only been logged since %startDateString%, so I can't show you this information!",
             "allTitle": "Total*",
-            "all": "%personUpper% %have% played `%timePlayedAll%` %game%",
+            "all": "%personUpper% %have% played `%timePlayedTotal%` %game%",
             "footer": "*%possessiveUpper% playtime is measured since %startDateString%"
         },
         "topPlayed": {

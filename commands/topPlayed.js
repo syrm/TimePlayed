@@ -11,7 +11,13 @@ module.exports = function(obj) {
             var sinceWarning = false;
             if(handledArgs.since && tools.convert.sinceDate(handledArgs.since) < startDate) sinceWarning = true;
             if(handledArgs.other && !handledArgs.defaultGame) return msg.edit(lang.commands.topPlayed.noGame.replace("%arg%", handledArgs.other))
-            tools.topGames(meantUser.id, handledArgs.since, function(topGames, totalMS) {
+            tools.topGames(meantUser.id, handledArgs.since, function(topGames) {
+                var totalSeconds = 0;
+                topGames.forEach(function(e) {
+                    totalSeconds += Number(e.time)
+                })
+                totalHours = Math.floor(totalSeconds / 3600);
+
                 if(topGames.length < 1 || topGames.every(e => e.time < 1)) {
                     if(handledArgs.since) {
                         return msg.edit(lang.commands.topPlayed.noGamePeriod)
@@ -29,9 +35,8 @@ module.exports = function(obj) {
                 } else {
                     embed.setDescription(lang.warnings.realityWarning)
                 }
-                var hours = Math.floor(totalMS / 3600000)
-                if(hours < 1) hours = "< 1"
-                lang = tools.replaceLang("%hours%", hours, lang)
+                if(totalHours < 1) totalHours = "< 1"
+                lang = tools.replaceLang("%hours%", totalHours, lang)
                 if(handledArgs.since) {
                     embed.setTitle(lang.commands.topPlayed.titleCustomSince2.replace("%customSince%", tools.convert.secondsToTime(tools.convert.stringToSeconds(handledArgs.since))), meantUser.avatarURL)
                 } else {

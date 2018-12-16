@@ -1,36 +1,52 @@
 var tools = require('./index.js')
 var connection = require('./connection.js');
 
-module.exports =  function(id, game, sinces, callback) {
-  if(!sinces) return callback()
-  connection.query("SET CHARACTER SET utf8mb4", function(error, results, fields) {
-    connection.query(`SELECT game, startDate, endDate FROM playtime WHERE userID=? AND game=?`, [id, game], function(error, permResults, fields) {
-      var results = [];
-      sinces.forEach(sinceString => {
-        var msCount = 0;
-        var since = tools.convert.sinceDate(sinceString)
-        permResults.forEach(function(result, i) {
-          if(!result.endDate) {
-            if(i != results.length - 1) {
-              return;
-            } else {
-              result.endDate = new Date()
-            }
-          }
-          var diffMS = 0;
-          if(result.endDate > since) {
-            if(result.startDate < since) {
-              diffMS = Math.abs(result.endDate.getTime() - since.getTime())
-            }
-            if(result.startDate > since) {
-              diffMS = Math.abs(result.endDate.getTime() - result.startDate.getTime());
-            }
-          }
-          if(diffMS > 0) msCount += diffMS
-        })
-        results[sinceString] = Math.floor(msCount / 1000)
-      })
-      return callback(results)
-    });
-  })
+var qDefaultSinces = `
+SELECT
+    SUM(IF(
+        startDate > ?,
+        TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
+        0)) AS today,
+    SUM(IF(
+		    startDate > ?,
+        TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
+        0)) AS week,
+	  SUM(
+		    TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))
+        ) AS total
+FROM
+    playtime
+WHERE
+    userID = ?
+    AND game = ?`
+
+var qCustomSince = `
+SELECT 
+    SUM(IF(
+		startDate > ?,
+        TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
+        0)) AS time
+FROM
+    playtime
+WHERE
+    userID = ?
+    AND game = ?`
+
+module.exports =  function(id, game, customSince, callback) {
+  if(customSince) {
+    customSince = tools.convert.sinceDate(customSince)
+    connection.query(qCustomSince, [customSince, id, game], function(error, results, fields) {
+      callback(results[0]);
+    })
+  } else {
+    var today = new Date();
+    today.setHours(6);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    var weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    connection.query(qDefaultSinces, [today, weekAgo, id, game], function(error, results, fields) {
+      callback(results[0])
+    })
+  }
 }

@@ -30,7 +30,7 @@ module.exports = function(obj) {
     
     function lastOnline(id, presence, callback) {
     if(presence.status != "offline") return callback("Right Now")
-        connection.query(`SELECT * FROM lastOnline WHERE userID=${id}`, function(error, results, fields) {
+        connection.query(`SELECT * FROM lastOnline WHERE userID=?`, [id], function(error, results, fields) {
         if(!results[0]) return callback("Not measured / Online since I got here", undefined);
         var str = tools.convert.timeDifference(results[0].date, new Date())
         str = str.charAt(0).toUpperCase() + str.slice(1)

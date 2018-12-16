@@ -2,7 +2,7 @@
 var mysql = require('mysql');
 const keys = require('../keys.json')
 // Initialize pool
-var pool      =    mysql.createPool({
+var pool = mysql.createPool({
     connectionLimit : 3,
     host: keys.mysqlhost,
     user: keys.mysqlusername,

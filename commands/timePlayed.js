@@ -37,24 +37,19 @@ module.exports = function(obj) {
             handledArgs.other = bestMatch;
           }
           lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
-          var sinces = []
-          if(!handledArgs.since) {
-            sinces = ['7d', 'today', undefined]
-          } else {
-            sinces.push(handledArgs.since)
-          }
-          tools.timePlayed(meantUser.id, handledArgs.other, sinces, function(results) {
-            times = [["7d", "Week"], ["today", "Day"], [undefined, "All"], [handledArgs.since, "Custom"]]
-            times.forEach(since => {
-              lang = tools.replaceLang(`%timePlayed${since[1]}%`, tools.convert.timeToString(results[since[0]]), lang)
-            })
+          
+          tools.timePlayed(meantUser.id, handledArgs.other, handledArgs.since, function(results) {
             if(handledArgs.since) {
+              lang = tools.replaceLang(`%timePlayedCustom%`, tools.convert.timeToString(results.time), lang)
               var string = lang.commands.timePlayed.customSince.replace("%customSince%", tools.convert.secondsToTime(tools.convert.stringToSeconds(handledArgs.since)))
               if(sinceWarning == true) {
                 string += lang.warnings.sinceWarning
               }
               return msg.edit(string)
             }
+            lang = tools.replaceLang(`%timePlayedWeek%`, tools.convert.timeToString(results.week), lang)
+            lang = tools.replaceLang(`%timePlayedDay%`, tools.convert.timeToString(results.today), lang)
+            lang = tools.replaceLang(`%timePlayedTotal%`, tools.convert.timeToString(results.total), lang)
             const embed = new Discord.RichEmbed()
             .setColor(3447003)
             .setDescription(lang.warnings.realityWarning)
@@ -71,8 +66,10 @@ module.exports = function(obj) {
             }
             embed.addField(lang.commands.timePlayed.allTitle, lang.commands.timePlayed.all)
             embed.setAuthor(lang.commands.timePlayed.title, meantUser.avatarURL)
-            tools.getThumbnail(handledArgs.other, obj.client, function(url) {
-              embed.setThumbnail(url)
+            tools.getThumbnail(handledArgs.other, function(url, color) {
+              console.log(color);
+              if(url) embed.setThumbnail(url)
+              if(color) embed.setColor(color)
               msg.edit({embed});
             })
           })
