@@ -67,7 +67,6 @@ module.exports = function(obj) {
             embed.addField(lang.commands.timePlayed.allTitle, lang.commands.timePlayed.all)
             embed.setAuthor(lang.commands.timePlayed.title, meantUser.avatarURL)
             tools.getThumbnail(handledArgs.other, function(url, color) {
-              console.log(color);
               if(url) embed.setThumbnail(url)
               if(color) embed.setColor(color)
               msg.edit({embed});

@@ -51,7 +51,7 @@ module.exports = function(obj) {
     }
     lastOnline(meantUser.id, meantUser.presence, function(string, date) {
         if(meantUser.bot) game = undefined;
-        tools.getThumbnail(game, obj.client, function(thumbnail) {
+        tools.getThumbnail(game, function(thumbnail) {
             if(thumbnail && !embed.thumbnail) {
             embed.setThumbnail(thumbnail);
             } else if(!embed.thumbnail) {
