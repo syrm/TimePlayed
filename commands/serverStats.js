@@ -15,56 +15,6 @@ var connection = mysql.createPool({
     multipleStatements: true
 });
 
-var q = `
-SELECT
-	game,
-    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
-    COUNT(DISTINCT userID) AS count
-FROM
-    guildStats
-WHERE
-    guildID = ?
-    %gamesOnly%
-GROUP BY game
-ORDER BY %orderBy% DESC
-LIMIT 5;
-
-SELECT
-	game,
-    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
-    COUNT(DISTINCT userID) AS count
-FROM
-    guildStats
-WHERE
-    guildID = ?
-    AND startDate > NOW() - INTERVAL 1 WEEK
-    %gamesOnly%
-GROUP BY game
-ORDER BY %orderBy% DESC
-LIMIT 5;
-
-SELECT
-	game,
-    SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
-    COUNT(DISTINCT userID) AS count
-FROM
-    guildStats
-WHERE
-    guildID = ?
-    AND startDate > NOW() - INTERVAL 30 DAY
-    %gamesOnly%
-GROUP BY game
-ORDER BY %orderBy% DESC
-LIMIT 5;
-
-SELECT
-  SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time
-FROM
-  guildStats
-WHERE
-    guildID = ?
-    %gamesOnly%`
-
 var qTP = `
 SELECT
     SUM(IF(
@@ -97,15 +47,64 @@ module.exports = function(obj) {
       var oneDay = 24*60*60*1000;
       var numDays = Math.ceil(Math.abs((startLogging.getTime() - now.getTime())/(oneDay)));
       if(!handledArgs.game) {
-        if(handledArgs.gamesOnly) {
-          q = q.replace(/%gamesOnly%/g, 'AND game NOT IN (SELECT game FROM knownGames WHERE type=2)')
+        var q = `
+        SELECT
+          game,
+            SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+            COUNT(DISTINCT userID) AS count
+        FROM
+            guildStats
+        WHERE
+            guildID = ?
+            %gamesOnly%
+        GROUP BY game
+        ORDER BY %orderBy% DESC
+        LIMIT 5;
+
+        SELECT
+          game,
+            SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+            COUNT(DISTINCT userID) AS count
+        FROM
+            guildStats
+        WHERE
+            guildID = ?
+            AND startDate > NOW() - INTERVAL 1 WEEK
+            %gamesOnly%
+        GROUP BY game
+        ORDER BY %orderBy% DESC
+        LIMIT 5;
+
+        SELECT
+          game,
+            SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time,
+            COUNT(DISTINCT userID) AS count
+        FROM
+            guildStats
+        WHERE
+            guildID = ?
+            AND startDate > NOW() - INTERVAL 30 DAY
+            %gamesOnly%
+        GROUP BY game
+        ORDER BY %orderBy% DESC
+        LIMIT 5;
+
+        SELECT
+          SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) AS time
+        FROM
+          guildStats
+        WHERE
+            guildID = ?
+            %gamesOnly%`
+        if(handledArgs.gamesOnly == true) {
+          q = q.replace(/%gamesOnly%/gm, 'AND game NOT IN (SELECT game FROM knownGames WHERE type=2)')
         } else {
-          q = q.replace(/%gamesOnly%/g, '')
+          q = q.replace(/%gamesOnly%/gm, '')
         }
         if(handledArgs.sortBy == 'count') {
-          q = q.replace(/%orderBy%/g, 'count')
+          q = q.replace(/%orderBy%/gm, 'count')
         } else {
-          q = q.replace(/%orderBy%/g, 'time')
+          q = q.replace(/%orderBy%/gm, 'time')
         }
         connection.query(q, [message.guild.id, message.guild.id, message.guild.id, message.guild.id], function(error, results, fields) {
           if(results.length < 1) return msg.edit(`It seems like no one in this server ever played any game! This might be because I just started logging everyone's playtime in this server, so please try again later.`)
