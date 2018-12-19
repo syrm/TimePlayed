@@ -45,6 +45,7 @@ var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+    if(!results) return;
     premiumGuilds = [];
     results.forEach(result => {
         premiumGuilds.push(result.guildID);
@@ -70,7 +71,7 @@ function refresh() {
 function lastOnline(oldMember, newMember, date) {
   if(oldMember.presence.status == newMember.presence.status || newMember.presence.status != "offline") return;
   connection.query(`SELECT * FROM lastOnline WHERE userID=?`, [oldMember.id], function(error, results, fields) {
-    if(error) throw error;
+    if(!results) return;
     if(results.length < 1) {
       connection.query(`INSERT INTO lastOnline (userID, date) VALUES (?, ?)`, [oldMember.id, date], function(error, results, fields) {
         if(error) throw error;
