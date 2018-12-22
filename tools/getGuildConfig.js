@@ -3,8 +3,7 @@ var connection = require('./connection.js');
 
 var defaultValues = {
   prefix: "!!",
-  defaultGame: "Fortnite",
-  roleAwards: "[]"
+  defaultGame: "Fortnite"
 }
 function toConfig(result) {
   Object.keys(defaultValues).forEach(key => {
@@ -12,23 +11,18 @@ function toConfig(result) {
       result[key] = defaultValues[key];
     }
   })
-  enableRankingMentions = false;
-  if(result.enableRankingMentions == 1) enableRankingMentions = true;
   var config = {
     prefix: result.prefix,
     rankingChannel: result.rankingChannel,
-    enableRankingMentions: enableRankingMentions,
-    defaultGame: result.defaultGame,
-    leaderboardAmount: result.leaderboardAmount,
-    roleAwards: JSON.parse(result.roleAwards)
+    defaultGame: result.defaultGame
   }
   return config;
 }
 
 module.exports = function(guildID, callback) {
-  connection.query("SELECT prefix, rankingChannel, enableRankingMentions, defaultGame, leaderboardAmount, roleAwards FROM guildSettings WHERE guildID=?", [guildID], function(error, results, fields) {
+  connection.query("SELECT prefix, rankingChannel, defaultGame FROM guildSettings WHERE guildID=?", [guildID], function(error, results, fields) {
     if(results.length < 1) {
-      connection.query("INSERT INTO guildSettings (guildID, prefix, defaultGame, roleAwards) VALUES (?, '!!', 'Fortnite', '[]')", [guildID], function(error, results, fields) {
+      connection.query("INSERT INTO guildSettings (guildID, prefix, defaultGame) VALUES (?, '!!', 'Fortnite')", [guildID], function(error, results, fields) {
         tools.getGuildConfig(guildID, function(config) {
           callback(config)
         })
