@@ -86,7 +86,6 @@ function postStats() {
         }
       },
       function (error, response, body) {
-        console.log("Stats posted!")
       }
     );
   }
