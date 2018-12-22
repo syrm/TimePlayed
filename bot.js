@@ -11,6 +11,7 @@ const fs = require('fs');
 const tools = require("./tools")
 const en = require('./lang/en.json')
 const DBL = require("dblapi.js")
+var request = require('request');
 
 const execute = require("./commands");
 
@@ -76,9 +77,20 @@ function postStats() {
     dbl.postStats(client.guilds.size)
       .then(err => console.log("Stats posted!"))
       .catch(err => console.log("Error posting stats"));
+    request.post(
+      `https://discord.bots.gg/api/v1/bots/433625399398891541/stats`,
+      {
+        json: { guildCount: client.guilds.size },
+        headers: {
+          'Authorization': keys.discordbotsToken2
+        }
+      },
+      function (error, response, body) {
+        console.log("Stats posted!")
+      }
+    );
   }
 }
-
 
 var commands = []
 var playtimeCommands = []
@@ -116,13 +128,11 @@ client.on("guildCreate", guild => {
 
   console.log(`${Date()}: Joined new guild: ${guild.name}, sent welcome message: ${found}`)
   log(`Joined a new server (current server count: ${client.guilds.size})`)
-  postStats()
 });
 client.on("guildDelete", guild => {
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   log(`Left a server (current server count: ${client.guilds.size})`)
   console.log(`${Date()}: Left guild: ${guild.name}`)
-  postStats()
 })
 
 client.on("message", message => {
