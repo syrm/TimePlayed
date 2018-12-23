@@ -4,11 +4,11 @@ var connection = require('./connection.js');
 var qDefaultSinces = `
 SELECT
     SUM(IF(
-        startDate > ?,
+        startDate > NOW() - INTERVAL 1 DAY,
         TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
         0)) AS today,
     SUM(IF(
-		    startDate > ?,
+		    startDate > NOW() - INTERVAL 1 WEEK,
         TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW())),
         0)) AS week,
 	  SUM(
@@ -39,13 +39,7 @@ module.exports =  function(id, game, customSince, callback) {
       callback(results[0]);
     })
   } else {
-    var today = new Date();
-    today.setHours(6);
-    today.setMinutes(0);
-    today.setSeconds(0);
-    var weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    connection.query(qDefaultSinces, [today, weekAgo, id, game], function(error, results, fields) {
+    connection.query(qDefaultSinces, [id, game], function(error, results, fields) {
       callback(results[0])
     })
   }
