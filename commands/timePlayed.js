@@ -45,6 +45,7 @@ module.exports = function(obj) {
           } else {
             embed.addField(lang.commands.timePlayed.dayTitle, lang.commands.timePlayed.day)
           }
+          embed.addField("Online profile", `For more detailed playtime stats, you can visit this user's [online profile](http://timeplayed.xyz/profile/${meantUser.id}).`)
           embed.addField(lang.commands.timePlayed.allTitle, lang.commands.timePlayed.all)
           embed.setAuthor(lang.commands.timePlayed.title, meantUser.avatarURL)
           tools.getThumbnail(handledArgs.other, function(url, color) {
@@ -56,6 +57,4 @@ module.exports = function(obj) {
       })
     })
   })
-  
-    
 }

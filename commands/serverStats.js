@@ -135,6 +135,7 @@ module.exports = function(obj) {
           embed.addField("Weekly top played games", topListToString(results[2], 7))
           embed.addField("Monthly top played games", topListToString(results[1], 30))
           embed.addField("Total top played games", topListToString(results[0], numDays))
+          embed.addField("Online profile", `For more detailed playtime stats, you can visit this server's [online profile](http://timeplayed.xyz/server/${message.guild.id}).`)
           return msg.edit(embed);
           
         })
@@ -157,6 +158,7 @@ module.exports = function(obj) {
               .addField("Weekly time played", tts(results[0].week, 7))
               .addField("Monthly time played", tts(results[0].month, 30))
               .addField("Total time played", tts(results[0].total, numDays))
+              .addField("Online profile", `For more detailed playtime stats, you can visit this server's [online profile](http://timeplayed.xyz/server/${message.guild.id}).`)
             return msg.edit(embed);
           })
         })
