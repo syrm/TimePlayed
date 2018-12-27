@@ -47,7 +47,7 @@ module.exports = function(obj) {
                         embed.addField(`${i + 1}. ${topGames[i].game}`, tools.convert.timeToString(topGames[i].time))
                     }
                 }
-                embed.addField("Online profile", `For more detailed playtime stats, you can visit this user's [online profile](http://timeplayed.xyz/profile/${meantUser.id}).`)
+                embed.addField("Online profile", `For more detailed playtime stats, you can visit this user's [online profile](http://www.timeplayed.xyz/profile/${meantUser.id}).`)
                 return msg.edit(embed)
             })
         })
