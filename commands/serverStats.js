@@ -35,7 +35,6 @@ WHERE
     guildID = ?
     AND game = ?`
 
-var gameCorrection = `SELECT game FROM gameAliases WHERE alias=? UNION SELECT DISTINCT game FROM guildStats WHERE guildID=? HAVING levenshtein(game, ?) < 4 AND game NOT IN (SELECT alias FROM gameAliases WHERE alias=?)`
 
 module.exports = function(obj) {
   var message = obj.message;
@@ -140,10 +139,9 @@ module.exports = function(obj) {
           
         })
       } else {
-        connection.query(gameCorrection, [handledArgs.game, message.guild.id, handledArgs.game, handledArgs.game], function(error, correctedGames, fields) {
-          if(correctedGames.length < 1) return msg.edit(`It seems like no one in this server ever played \`${handledArgs.game}\` or something simalar! Please check your spelling or try again with a different game.`)
-          handledArgs.game = correctedGames[0].game
-          connection.query(qTP, [message.guild.id, handledArgs.game], function(error, results, fields) {
+        tools.correctGame.server(handledArgs.game, message.guild.id, function(correctedGame) {
+          if(!correctedGame) return msg.edit(`It seems like no one in this server ever played \`${handledArgs.game}\` or something simalar! Please check your spelling or try again with a different game.`)
+          connection.query(qTP, [message.guild.id, correctedGame], function(error, results, fields) {
             numUsers = results[0].count
             numUsersPercent = Math.round(numUsers / message.guild.members.size * 100 * 100) / 100
             function tts(num, days) {;
@@ -152,9 +150,9 @@ module.exports = function(obj) {
             const embed = new Discord.RichEmbed()
               .setAuthor(`${message.guild.name}'s stats`, message.guild.iconURL)
               .setColor(3447003)
-              .setDescription(`Welcome to \`${message.guild.name}\`'s \`${handledArgs.game}\` statistics.`)
-              .addField(`Amount of users who ever played ${handledArgs.game}`, `**${numUsers}** (${numUsersPercent}% of all server members)`, true)
-              .addField(`Average playtime per user per day`, `Including users who never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(results[0].total / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${handledArgs.game}\`:\n*${tools.convert.timeToString(results[0].total / numDays / numUsers)}*`)
+              .setDescription(`Welcome to \`${message.guild.name}\`'s \`${correctedGame}\` statistics.`)
+              .addField(`Amount of users who ever played ${correctedGame}`, `**${numUsers}** (${numUsersPercent}% of all server members)`, true)
+              .addField(`Average playtime per user per day`, `Including users who never played \`${correctedGame}\`:\n*${tools.convert.timeToString(results[0].total / numDays / message.guild.members.size)}*\nExcluding users who have never played \`${correctedGame}\`:\n*${tools.convert.timeToString(results[0].total / numDays / numUsers)}*`)
               .addField("Weekly time played", tts(results[0].week, 7))
               .addField("Monthly time played", tts(results[0].month, 30))
               .addField("Total time played", tts(results[0].total, numDays))

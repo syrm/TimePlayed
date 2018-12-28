@@ -1,5 +1,5 @@
 var tools = require('./index.js')
-var connection = require('./connection.js')
+var connection = tools.getConnection;
 
 module.exports =  function(guilds, callback) {
   if(guilds.length < 1) return callback()

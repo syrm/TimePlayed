@@ -1,7 +1,5 @@
 var tools = require('./index.js')
-const mysql = require('mysql')
-const keys = require('../keys.json')
-var connection = require('./connection.js')
+var connection = tools.getConnection;
 
 module.exports =  function(guilds, sinces, callback) {
   if(!sinces) {

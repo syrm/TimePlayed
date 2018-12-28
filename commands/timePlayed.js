@@ -1,6 +1,5 @@
 const tools = require("../tools");
 const Discord = require("discord.js")
-var connection = tools.getConnection;
 
 module.exports = function(obj) {
   var message = obj.message;
@@ -12,14 +11,12 @@ module.exports = function(obj) {
     tools.getStartDate(meantUser.id, function(startDate) {
       var sinceWarning = false;
       if(handledArgs.since && tools.convert.sinceDate(handledArgs.since) < startDate) sinceWarning = true;
-      var gameCorrection = "SELECT game FROM gameAliases WHERE alias=? AND game IN (SELECT DISTINCT GAME FROM playtime WHERE userID=?) UNION SELECT DISTINCT game FROM playtime WHERE userID=? HAVING levenshtein(game, ?) < 4 AND game NOT IN (SELECT alias FROM gameAliases WHERE alias=?)"
-      connection.query(gameCorrection, [handledArgs.other, meantUser.id, meantUser.id, handledArgs.other, handledArgs.other], function(error, correctedGames, fields) {
-        if(correctedGames.length < 1) return msg.edit(lang.commands.timePlayed.noPlaytime.replace("%game%", handledArgs.other) + lang.warnings.realityWarning)
-        handledArgs.other = correctedGames[0].game
+      tools.correctGame.user(handledArgs.other, meantUser.id, function(correctedGame) {
+        if(!correctedGame) return msg.edit(lang.commands.timePlayed.noPlaytime.replace("%game%", handledArgs.other) + lang.warnings.realityWarning)
+
+        lang = tools.replaceLang(/%game%+/g, correctedGame, lang)
         
-        lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
-        
-        tools.timePlayed(meantUser.id, handledArgs.other, handledArgs.since, function(results) {
+        tools.timePlayed(meantUser.id, correctedGame, handledArgs.since, function(results) {
           if(handledArgs.since) {
             lang = tools.replaceLang(`%timePlayedCustom%`, tools.convert.timeToString(results.time), lang)
             var string = lang.commands.timePlayed.customSince.replace("%customSince%", tools.convert.secondsToTime(tools.convert.stringToSeconds(handledArgs.since)))
@@ -45,10 +42,10 @@ module.exports = function(obj) {
           } else {
             embed.addField(lang.commands.timePlayed.dayTitle, lang.commands.timePlayed.day)
           }
-          embed.addField("Online profile", `For more detailed playtime stats, you can visit this user's [online profile](http://www.timeplayed.xyz/profile/${meantUser.id}).`)
           embed.addField(lang.commands.timePlayed.allTitle, lang.commands.timePlayed.all)
+          embed.addField("Online profile", `For more detailed playtime stats, you can visit this user's [online profile](http://www.timeplayed.xyz/profile/${meantUser.id}).`)
           embed.setAuthor(lang.commands.timePlayed.title, meantUser.avatarURL)
-          tools.getThumbnail(handledArgs.other, function(url, color) {
+          tools.getThumbnail(correctedGame, function(url, color) {
             if(url) embed.setThumbnail(url)
             if(color) embed.setColor(color)
             msg.edit({embed});
