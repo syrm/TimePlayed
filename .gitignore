@@ -65,7 +65,6 @@ data/
 old_versions/
 start.bat
 package-lock.json
-package.json
 update.js
 premium.js
 temp.js
