@@ -17,35 +17,40 @@ module.exports = function(obj) {
   var guildConf = obj.guildConf
   var lang = obj.lang;
   if(message.member.hasPermission("ADMINISTRATOR")) {
-      if(message.guild.me.hasPermission("MANAGE_ROLES") == false) {
+      // Check for manage roles permission
+      if(!message.guild.me.hasPermission("MANAGE_ROLES")) {
         return message.reply(lang.commands.addRole.noPermission)
       }
+
+      // Check if role exists
       var role = getRole(handledArgs.role, message.guild, message)
       if(!role) return message.reply(lang.commands.addRole.cantFindRole.replace("%role%", handledArgs.role))
-      if(guildConf.roleAwards.length > 2 && !premium) return message.reply(lang.commands.addRole.threeRolesMax)
-      if(guildConf.roleAwards.length > 9) return message.reply(lang.commands.addRole.tenRolesMax)
 
-      // Check if the role is lower than the highest bot role
-      var highestBotRole = message.guild.me.roles.sort(function(a, b) {
-        return a.position < b.position
-      }).first()
-      if(role.position >= highestBotRole.position) return message.reply(lang.commands.addRole.roleTooHigh)
+      connection.query("SELECT roleID FROM roleAwards WHERE guildID=?", [message.guild.id], function(error, results, fields) {
+        if(results.length > 2 && !obj.premium) return message.reply(lang.commands.addRole.threeRolesMax)
+        if(results.length > 9) return message.reply(lang.commands.addRole.tenRolesMax)
+        // Check for duplicates
+        connection.query("SELECT roleID FROM roleAwards WHERE guildID=? AND roleID=?", [message.guild.id, role.id], function(error, results, fields) {
+          if(results.length > 0) return message.reply(lang.commands.addRole.alreadyAssigned)
 
-      // Check if award with the same role already exist
-      connection.query("SELECT roleID FROM roleAwards WHERE guildID=? AND roleID=?", [message.guild.id, role.id], function(error, results, fields) {
-        var same = false;
-        if(results.length > 0) same = true;
-        if(same) return message.reply(lang.commands.addRole.alreadyAssigned)
-
-        // Insert the award
-        var timeSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[0])
-        var perSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[1])
-        connection.query("INSERT INTO roleAwards (guildID, game, time, per, roleID) VALUES (?, ?, ?, ?, ?)", [message.guild.id, handledArgs.game, timeSeconds, perSeconds, role.id], function(error, results, fields) {
-          var str = lang.commands.addRole.success.replace("%role%", role).replace("%neededTime%", tools.convert.secondsToTime(timeSeconds, true)).replace("%timePeriod%", tools.convert.secondsToTime(perSeconds, true))
-          if(handledArgs.defaultGame) str += lang.commands.addRole.defaultGameNote
-          return message.channel.send(str)
+          // Check if the role is lower than the highest bot role
+          var highestBotRole = message.guild.me.roles.sort(function(a, b) {
+            return a.position < b.position
+          }).first()
+          if(role.position >= highestBotRole.position) return message.reply(lang.commands.addRole.roleTooHigh)
+  
+          // Insert the award
+          var timeSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[0])
+          var perSeconds = tools.convert.stringToSeconds(handledArgs.since.split("/")[1])
+          connection.query("INSERT INTO roleAwards (guildID, game, time, per, roleID) VALUES (?, ?, ?, ?, ?)", [message.guild.id, handledArgs.game, timeSeconds, perSeconds, role.id], function(error, results, fields) {
+            var str = lang.commands.addRole.success.replace("%role%", role).replace("%neededTime%", tools.convert.secondsToTime(timeSeconds, true)).replace("%timePeriod%", tools.convert.secondsToTime(perSeconds, true))
+            if(handledArgs.defaultGame) str += lang.commands.addRole.defaultGameNote
+            return message.channel.send(str)
+          })
         })
       })
+
+      
     } else {
       return message.reply(lang.errors.noPermission)
     }
