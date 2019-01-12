@@ -277,10 +277,10 @@ client.on("message", message => {
     // Execute the private check (async)
     tools.termsCheck(message.author.id, id, guildID, function(results) {
       accept = results[0]
-      if(selfhost) {
-        premium = true;
-      } else {
+      if(!selfhost) {
         premium = results[1];
+      } else {
+        premium = true;
       }
       
       connection.query(`SELECT count(*) FROM privateUsers WHERE userID=?`, [id], function(error, results, fields) {
