@@ -1,22 +1,23 @@
 // Made by xVaql#4581, all rights reserved
 const keys = require('./keys.json');
 var beta = keys.beta;
-
-var token = keys.botToken
-const key = keys.imageAPIKeys;
+var selfHost = keys.selfHost;
+var token = keys.botToken;
 
 // Require everything
 const Discord = require("discord.js")
-const fs = require('fs');
 const tools = require("./tools")
 const en = require('./lang/en.json')
-const DBL = require("dblapi.js")
-var request = require('request');
+
+if(!selfHost) {
+  DBL = require("dblapi.js")
+  request = require('request');
+  dbl = new DBL(keys.discordbotsToken, client);
+}
 
 const execute = require("./commands");
 
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fetchAllMembers: true});
-const dbl = new DBL(keys.discordbotsToken, client);
 
 var connection = require('./tools/connection.js');
 
@@ -66,29 +67,27 @@ function wrongSyntax(message, command, lang) {
 }
 
 function log(message) {
-  if(beta) return;
+  if(beta || selfHost) return;
   var logChannel = client.channels.get("462909240298962944")
   logChannel.send(`\`${message}\``)
   return message;
 }
 
 function postStats() {
-  if(!beta) {
-    dbl.postStats(client.guilds.size)
-      .then(err => console.log("Stats posted!"))
-      .catch(err => console.log("Error posting stats"));
-    request.post(
-      `https://discord.bots.gg/api/v1/bots/433625399398891541/stats`,
-      {
-        json: { guildCount: client.guilds.size },
-        headers: {
-          'Authorization': keys.discordbotsToken2
-        }
-      },
-      function (error, response, body) {
+  dbl.postStats(client.guilds.size)
+    .then(err => console.log("Stats posted!"))
+    .catch(err => console.log("Error posting stats"));
+  request.post(
+    `https://discord.bots.gg/api/v1/bots/433625399398891541/stats`,
+    {
+      json: { guildCount: client.guilds.size },
+      headers: {
+        'Authorization': keys.discordbotsToken2
       }
-    );
-  }
+    },
+    function (error, response, body) {
+    }
+  );
 }
 
 var commands = []
@@ -105,11 +104,13 @@ client.on("ready", () => {
   log("Started up!")
   console.log(`Bot is ready!`);
   console.log(`I'm in ${client.guilds.size} guilds.`)
-  postStats()
-  setInterval(postStats, 1800000);
   setInterval(() => {
     client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   }, 60000)
+  if(!beta && !selfHost) {
+    postStats()
+    setInterval(postStats, 1800000);
+  }
 });
 
 client.on("guildCreate", guild => {
@@ -276,7 +277,12 @@ client.on("message", message => {
     // Execute the private check (async)
     tools.termsCheck(message.author.id, id, guildID, function(results) {
       accept = results[0]
-      premium = results[1]
+      if(selfhost) {
+        premium = true;
+      } else {
+        premium = results[1];
+      }
+      
       connection.query(`SELECT count(*) FROM privateUsers WHERE userID=?`, [id], function(error, results, fields) {
         var private = results[0]["count(*)"] > 0;
         var termsMSG;
