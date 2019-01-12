@@ -21,8 +21,8 @@ module.exports = function(obj) {
         embed.addField(`Creator`, `I was created by <@112237401681727488> (@${client.users.get("112237401681727488").tag}), you can DM him whenever you need help with the bot`)
         embed.addField(`Useful links`, lang.commands.help.links)
         return message.channel.send(embed).then(res => {
-            var num = 3;
-            if(!message.channel.type == "dm") num = 4
+            var num = 5;
+            if(!message.channel.type == "dm") num = 6
             embed.fields[num].value = embed.fields[num].value.replace("measuring...", `${res.createdAt.getTime() - message.createdAt.getTime()}ms`)
             res.edit(embed)
         })
