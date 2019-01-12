@@ -9,17 +9,17 @@ const Discord = require("discord.js")
 const tools = require("./tools")
 const en = require('./lang/en.json')
 
-if(!selfHost) {
-  DBL = require("dblapi.js")
-  request = require('request');
-  dbl = new DBL(keys.discordbotsToken, client);
-}
-
 const execute = require("./commands");
 
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fetchAllMembers: true});
 
 var connection = require('./tools/connection.js');
+
+if(!selfHost) {
+  DBL = require("dblapi.js")
+  request = require('request');
+  dbl = new DBL(keys.discordbotsToken, client);
+}
 
 function bulkReplaceLang(arr, msg) {
   var lang = msg;
