@@ -277,7 +277,7 @@ client.on("message", message => {
     // Execute the private check (async)
     tools.termsCheck(message.author.id, id, guildID, function(results) {
       accept = results[0]
-      if(!selfhost) {
+      if(!keys.selfhost) {
         premium = results[1];
       } else {
         premium = true;
