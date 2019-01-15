@@ -1,5 +1,6 @@
 const tools = require("../tools");
 const Discord = require("discord.js")
+var keys = require("../keys.json")
 var version = require("../package.json").version
 var connection = tools.getConnection;
 module.exports = function(obj) {
@@ -18,7 +19,9 @@ module.exports = function(obj) {
         if(!message.channel.type == "dm") embed.addField(`Joined at`, `I joined this server at \`${message.guild.joinedAt}\``)
         embed.addField(`Last restart`, `My last restart was \`${tools.convert.timeToString(client.uptime / 1000)}\` ago`)
         embed.addField(`Ping`, `My heartbeat is \`${client.ping}\`ms\nMy response time to this command was: \`measuring...\``)
-        embed.addField(`Creator`, `I was created by <@112237401681727488> (@${client.users.get("112237401681727488").tag}), you can DM him whenever you need help with the bot`)
+        if(!keys.selfHost) {
+            embed.addField(`Creator`, `I was created by <@112237401681727488> (@${client.users.get("112237401681727488").tag}), you can DM him whenever you need help with the bot`)
+        }
         embed.addField(`Useful links`, lang.commands.help.links)
         return message.channel.send(embed).then(res => {
             var num = 5;
