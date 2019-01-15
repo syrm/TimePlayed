@@ -165,15 +165,6 @@ client.on("message", message => {
     // Delete rankingChannel messages
     if(`<#${message.channel.id}>` == guildConf.rankingChannel) return message.delete()
 
-    // Check for restart command (can only be ran by me)
-    if(message.content == "!!restart" && message.author.id == "112237401681727488") {
-        console.log("Restarting...")
-        log("Restarting the bot due to updates/maintenance...")
-        message.reply("Restarting the bot...").then(() => {
-          process.exit()
-        })
-    }
-
     // Check if message is a command
     
     // Convert aliases to a regular command
