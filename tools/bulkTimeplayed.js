@@ -45,9 +45,9 @@ module.exports =  function(guilds, sinces, callback) {
           }
           if(sinceResults.some(e => e.id == value.userID)) {
             var i = sinceResults.map(function(e) { return e.id; }).indexOf(value.userID);
-            sinceResults[i].minutes += msCount / 60000;
+            sinceResults[i].seconds += msCount / 1000;
           } else {
-            sinceResults.push({id: value.userID, minutes: msCount / 60000})
+            sinceResults.push({id: value.userID, seconds: msCount / 1000})
           }
         })
         guildResults.push(sinceResults)

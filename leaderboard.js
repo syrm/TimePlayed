@@ -51,17 +51,17 @@ function topListToString(topLists, guildConf, guildID) {
     for(i = 0; i < amount; i++) {
       var num = i + 1;
       var obj = topLists[sinceIndex][i];
-      var mins = 0;
+      var secs = 0;
       var user;
       if(obj) {
-        mins = obj.minutes
+        secs = obj.seconds
         user = client.users.get(obj.id)
       }
-      if(obj && user && mins > 1) {
+      if(obj && user && secs > 1) {
         lines = replaceLayout(lines, `%${since}${num}-name%`, user.username)
         lines = replaceLayout(lines, `%${since}${num}-tag%`, user.discriminator)
         lines = replaceLayout(lines, `%${since}${num}-mention%`, `<@${user.id}>`)
-        lines = replaceLayout(lines, `%${since}${num}-time%`, tools.convert.timeToString(mins))
+        lines = replaceLayout(lines, `%${since}${num}-time%`, tools.convert.timeToString(secs))
       } else {
         var vars = ["name", "tag", "mention", "time"];
         var done = [];
@@ -152,7 +152,7 @@ function updateRankingChannel() {
             if(index != -1) {
               var topLists = results[index].results
               for(var i = 0; i < topLists.length; i++) {
-                topLists[i].sort(function(a,b) {return b.minutes - a.minutes})
+                topLists[i].sort(function(a,b) {return b.seconds - a.seconds})
               }
               fetchBotMessages(20, rankingChannel)
                 .then(message => {
