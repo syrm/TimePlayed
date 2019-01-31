@@ -234,8 +234,7 @@ client.on("message", message => {
       lang = tools.replaceLang(/%possessiveUpper%+/g, "Your", lang)
       lang = tools.replaceLang(/%personUpper%+/g, "You", lang)
     }
-    
-    lang = bulkReplaceLang([["%be%", toBe], ["%have%", toHave], ["%person%", person], ["%possessive%", possessive], ["%prefix%", guildConf.prefix], ["%guildId%", guildID]], lang)
+    lang = bulkReplaceLang([["%be%", toBe], ["%have%", toHave], ["%person%", person], ["%possessive%", possessive], ["%prefix%", guildConf.prefix], ["%guildId%", guildID], ["%clientId%", client.user.id]], lang)
     if(handledArgs.game) lang = tools.replaceLang(/%game%+/g, handledArgs.game, lang)
     if(command != "timeplayed") lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
 

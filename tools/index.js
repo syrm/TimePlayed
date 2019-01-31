@@ -19,7 +19,6 @@ exports.lastPlayed = require('./lastPlayed')
 exports.filterTerms = require('./filterTerms')
 
 exports.replaceLang = require('./replaceLang')
-exports.acceptCollector = require('./acceptCollector')
 exports.getThumbnail = require('./getThumbnail')
 exports.awaitReaction = require('./awaitReaction')
 

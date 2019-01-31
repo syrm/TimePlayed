@@ -165,7 +165,7 @@
             "helpDescription": "Get a link to invite me to your server",
             "fullDescription": "This command simply gives you a link to invite the bot to your server, along with some getting started information.",
             "PMSupport": true,
-            "msg": "Here's my invite link: <http://invite.timeplayed.xyz/>\nIf it doesn't work please try this one: <https://discordapp.com/oauth2/authorize?client_id=433625399398891541&scope=bot&permissions=268708928>\nAnd here's some help to get started with me: <http://www.timeplayed.xyz/getting-started>"
+            "msg": "Here's my invite link: <http://invite.timeplayed.xyz/>\nIf it doesn't work please try this one: <https://discordapp.com/oauth2/authorize?client_id=%clientId%&scope=bot&permissions=268708928>\nAnd here's some help to get started with me: <http://www.timeplayed.xyz/getting-started>"
         },
         "setPrivacy": {
             "args": "",
