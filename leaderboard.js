@@ -44,7 +44,7 @@ function topListToString(topLists, guildConf, guildID) {
   function replaceLayout(lines, toReplace, replacement) {
     lines.forEach((line, lineIndex) => {
       reg = new RegExp(replacement, "g");
-      lines[lineIndex] = line.replace(toReplace, reg)
+      lines[lineIndex] = line.replace(reg, replacement)
     })
     return lines;
   }
