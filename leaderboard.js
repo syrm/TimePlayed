@@ -43,7 +43,8 @@ function topListToString(topLists, guildConf, guildID) {
   var deleted = [];
   function replaceLayout(lines, toReplace, replacement) {
     lines.forEach((line, lineIndex) => {
-      lines[lineIndex] = line.replace(toReplace, replacement)
+      reg = new RegExp(replacement, "g");
+      lines[lineIndex] = line.replace(toReplace, reg)
     })
     return lines;
   }
