@@ -14,9 +14,10 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
-function clearup(table, callback) {
-  connection.query(`SELECT * FROM ${table} WHERE endDate IS NULL`, function(error, results, fields) {
+function clearup(callback) {
+  connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
     var toEnd = [];
+    var toInsert = [];
     results.forEach(result => {
       var user = client.users.get(result.userID);
       if(!user) return;
@@ -24,19 +25,25 @@ function clearup(table, callback) {
         toEnd.push(user.id);
       } else if(user.presence.game.name != result.game) {
         toEnd.push(user.id);
-        connection.query(`INSERT INTO ${table} (userID, game, startDate) VALUES (?, ?, ?)`, [user.id, user.presence.game.name, new Date()], function(error, results, fields) {})
+        toInsert.push([user.id, user.presence.game.name, new Date()]);
       }
     })
-    if(toEnd.length > 0) {
-      connection.query(`UPDATE ${table} SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
-        setTimeout(function() {
+    if(toEnd.length > 0 && toInsert.length > 0) {
+      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
           callback()
-        }, 2000);
+        })
+      })
+    } else if(toEnd.length > 0) {
+      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        callback()
+      })
+    } else if(toInsert.length > 0) {
+      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+        callback()
       })
     } else {
-      setTimeout(function() {
-        callback()
-      }, 2000);
+      callback();
     }
   })
 }
@@ -92,11 +99,11 @@ function gameUpdate(oldMember, newMember, date, afk) {
     }
   }
   if(newMember.presence.game) {
-    // Return if same
+    // Return if same (if status or something else in presence changed)
     if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-    // Als hij nog nu een game aan het spelen is
+    // If still playing
     if(oldMember.presence.game) {
-      // Als de game veranderd is
+      // If game changed
       console.log(`Regular: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
       connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
         if(error) throw error;
@@ -106,7 +113,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
       })
       removeAfk();
     } else {
-      // Als hij begonnen is met spelen
+      // If started playing
       console.log(`Regular: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
       connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
         if(error) throw error;
@@ -114,7 +121,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
       removeAfk();
     }
   } else if(oldMember.presence.game) {
-    // Als hij gestopt is met spelen
+    // If stopped playing
     console.log(`Regular: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
     connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
       if(error) throw error;
@@ -125,7 +132,7 @@ function gameUpdate(oldMember, newMember, date, afk) {
 
 client.on("ready", () => {
   console.log("Clearing up restart differences...");
-  clearup("playtime", function() {
+  clearup(function() {
     console.log("Clearup done");
     console.log("Started logging")
     refresh()
@@ -160,7 +167,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 })
 
 // For server stats logging
-client.on("presenceUpdate", (oldMember, newMember) => {
+/* client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
   var guild = oldMember.guild;
   var date = new Date();
@@ -193,6 +200,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
       if(error) throw error;
     })
   }
-})
+}) */
 
 client.login(token);
