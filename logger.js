@@ -167,12 +167,12 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 })
 
 // For server stats logging
-/* client.on("presenceUpdate", (oldMember, newMember) => {
+client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
   var guild = oldMember.guild;
   var date = new Date();
   // Return if guild isn't premium
-  if(!premiumGuilds.includes(guild.id)) return;
+  if(!keys.selfhost && !premiumGuilds.includes(guild.id)) return;
   // Return if same
   if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
   if(newMember.presence.game) {
@@ -200,6 +200,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
       if(error) throw error;
     })
   }
-}) */
+})
 
 client.login(token);
