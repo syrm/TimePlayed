@@ -96,12 +96,10 @@ function refresh() {
         toLastOnline.push(oldMember.id)
       }
     })
+
     connection.query("UPDATE playtime SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
-      if(error) throw error;
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
-        if(error) throw error;
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
-          if(error) throw error;
           setTimeout(refresh, 5000)
         })
       })
