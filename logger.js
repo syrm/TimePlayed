@@ -97,7 +97,7 @@ function refresh() {
       }
     })
 
-    connection.query("UPDATE playtime SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
+    connection.query("UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
           setTimeout(refresh, 5000)
