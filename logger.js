@@ -68,6 +68,7 @@ function refresh() {
   tools.filterTerms(toCheck, function(accepted) {
     var toInsert = [];
     var toEnd = [];
+    var toLastOnline = [];
     accepted.forEach(arr => {
       var oldMember = arr[0];
       var newMember = arr[1];
@@ -82,7 +83,7 @@ function refresh() {
           toEnd.push(oldMember.id)
           toInsert.push([oldMember.id, date, newMember.presence.game.name])
         } else {
-          // If started playing
+          // If started playing 
           console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
           toInsert.push([oldMember.id, date, newMember.presence.game.name])
         }
@@ -91,29 +92,19 @@ function refresh() {
         console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
         toEnd.push(oldMember.id)
       }
+      if(oldMember.presence.status != newMember.presence.status && newMember.presence.status == "offline") {
+        console.log(`${oldMember.displayName} went offline`)
+        toLastOnline.push(oldMember.id)
+      }
     })
     connection.query("UPDATE playtime SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
-        console.log("Done!")
+        connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
+          console.log("Done!")
+        })
       })
     })
     toCheck = []
-  })
-}
-
-function lastOnline(oldMember, newMember, date) {
-  if(oldMember.presence.status == newMember.presence.status || newMember.presence.status != "offline") return;
-  connection.query(`SELECT * FROM lastOnline WHERE userID=?`, [oldMember.id], function(error, results, fields) {
-    if(!results) return;
-    if(results.length < 1) {
-      connection.query(`INSERT INTO lastOnline (userID, date) VALUES (?, ?)`, [oldMember.id, date], function(error, results, fields) {
-        if(error) throw error;
-      })
-    } else {
-      connection.query(`UPDATE lastOnline SET date=? WHERE userID=?`, [date, oldMember.id], function(error, results, fields) {
-        if(error) throw error;
-      })
-    }
   })
 }
 

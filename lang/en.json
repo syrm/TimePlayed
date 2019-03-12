@@ -86,16 +86,6 @@
             "more": "In this server, **%count% people are currently playing %game%:**\n",
             "moreThanTwenty": "**And %more% more people, but that would be too many to count!**"
         },
-        "afk": {
-            "args": "",
-            "aliases": ["pause"],
-            "helpDescription": "Toggle your AFK status",
-            "category": "Playtime commands",
-            "fullDescription": "This command toggles your AFK status. If you go AFK, your playtime won't be logged anymore and it will be displayed on your `%prefix%status` page.",
-            "PMSupport": true,
-            "toggleOn": "Alright! I won't log your playtime until you go offline, change games or run the `%prefix%afk` command again.",
-            "toggleOff": "Success! You are no longer marked as AFK and I will continue logging your playtime!"
-        },
         "lastPlayed": {
             "args": "[@user] [game]",
             "aliases": [],
