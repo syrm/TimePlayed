@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function clearup(callback) {
-  connection.query(`SELECT * FROM playtime2 WHERE endDate IS NULL`, function(error, results, fields) {
+  connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
     var toEnd = [];
     var toInsert = [];
     results.forEach(result => {
@@ -29,17 +29,17 @@ function clearup(callback) {
       }
     })
     if(toEnd.length > 0 && toInsert.length > 0) {
-      connection.query(`UPDATE playtime2 SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
-        connection.query(`INSERT INTO playtime2 (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
           callback()
         })
       })
     } else if(toEnd.length > 0) {
-      connection.query(`UPDATE playtime2 SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
         callback()
       })
     } else if(toInsert.length > 0) {
-      connection.query(`INSERT INTO playtime2 (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
         callback()
       })
     } else {
@@ -92,8 +92,8 @@ function refresh() {
         toEnd.push(oldMember.id)
       }
     })
-    connection.query("UPDATE playtime2 SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
-      connection.query("INSERT INTO playtime2 (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
+    connection.query("UPDATE playtime SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
+      connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         console.log("Done!")
       })
     })
