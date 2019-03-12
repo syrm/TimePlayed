@@ -35,7 +35,7 @@ function clearup(callback) {
         })
       })
     } else if(toEnd.length > 0) {
-      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+      connection.query(`UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
         callback()
       })
     } else if(toInsert.length > 0) {
