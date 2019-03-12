@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function clearup(callback) {
-  connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
+  connection.query(`SELECT * FROM playtime2 WHERE endDate IS NULL`, function(error, results, fields) {
     var toEnd = [];
     var toInsert = [];
     results.forEach(result => {
@@ -29,17 +29,17 @@ function clearup(callback) {
       }
     })
     if(toEnd.length > 0 && toInsert.length > 0) {
-      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
-        connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+      connection.query(`UPDATE playtime2 SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        connection.query(`INSERT INTO playtime2 (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
           callback()
         })
       })
     } else if(toEnd.length > 0) {
-      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+      connection.query(`UPDATE playtime2 SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
         callback()
       })
     } else if(toInsert.length > 0) {
-      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+      connection.query(`INSERT INTO playtime2 (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
         callback()
       })
     } else {
@@ -66,11 +66,37 @@ setInterval(updatePremiumGuilds, 60000);
 function refresh() {
   console.log("Refreshing...")
   tools.filterTerms(toCheck, function(accepted) {
+    var toInsert = [];
+    var toEnd = [];
     accepted.forEach(arr => {
-      lastOnline(arr[0], arr[1], arr[2])
-      gameUpdate(arr[0], arr[1], arr[2], arr[3])
+      var oldMember = arr[0];
+      var newMember = arr[1];
+      var date = arr[2];
+      if(newMember.presence.game) {
+        // Return if game still the same
+        if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
+        // If still playing a game
+        if(oldMember.presence.game) {
+          // If game changed
+          console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+          toEnd.push(oldMember.id)
+          toInsert.push([oldMember.id, date, newMember.presence.game.name])
+        } else {
+          // If started playing
+          console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+          toInsert.push([oldMember.id, date, newMember.presence.game.name])
+        }
+      } else if(oldMember.presence.game) {
+        // If stopped playing
+        console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+        toEnd.push(oldMember.id)
+      }
     })
-    console.log(`Done, ${accepted.length} of the ${toCheck.length} accepted`)
+    connection.query("UPDATE playtime2 SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
+      connection.query("INSERT INTO playtime2 (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
+        console.log("Done!")
+      })
+    })
     toCheck = []
   })
 }
@@ -91,45 +117,6 @@ function lastOnline(oldMember, newMember, date) {
   })
 }
 
-function gameUpdate(oldMember, newMember, date, afk) {
-  function removeAfk() {
-    if(afk) {
-      connection.query("DELETE FROM afk WHERE userID=?", [oldMember.id], function(error, results, fields) {
-      })
-    }
-  }
-  if(newMember.presence.game) {
-    // Return if same (if status or something else in presence changed)
-    if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-    // If still playing
-    if(oldMember.presence.game) {
-      // If game changed
-      console.log(`Regular: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
-      connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
-        if(error) throw error;
-      })
-      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
-        if(error) throw error;
-      })
-      removeAfk();
-    } else {
-      // If started playing
-      console.log(`Regular: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
-      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [[[oldMember.id, newMember.presence.game.name, date]]], function(error, results, fields) {
-        if(error) throw error;
-      })
-      removeAfk();
-    }
-  } else if(oldMember.presence.game) {
-    // If stopped playing
-    console.log(`Regular: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
-    connection.query(`UPDATE playtime SET endDate=? WHERE userID=? AND game=? AND endDate IS NULL`, [date, oldMember.id, oldMember.presence.game.name], function(error, results, fields) {
-      if(error) throw error;
-    })
-    removeAfk();
-  }
-}
-
 client.on("ready", () => {
   console.log("Clearing up restart differences...");
   clearup(function() {
@@ -140,33 +127,16 @@ client.on("ready", () => {
   })
 });
 
-client.on("guildMemberRemove", member => {
-  connection.query(`SELECT userID FROM termsAccept WHERE userID = ?`, [member.id], function(err, results, fields) {
-    if(err) throw err;
-    if(results.length > 0) {
-      var found = false;
-      client.guilds.forEach(guild => {
-        guild.members.forEach(currentMember => {
-          if(currentMember.id == member.id) found = true;
-        })
-      })
-      if(!found) {
-        connection.query(`DELETE FROM termsAccept WHERE userID = ?`, [member.id], function(err) {
-          console.log(`Stopped logging playtime for user (${member.user.tag}), deleted from start date table`)
-        })
-      }
-    }
-  });
-})
 // For regular logging
 client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
+
   var sharedGuilds = client.guilds.filter(guild => {return guild.members.get(oldMember.id)}).keyArray()
   if(sharedGuilds.indexOf(oldMember.guild.id) != 0) return;
   toCheck.push([oldMember, newMember, new Date()])
 })
 
-// For server stats logging
+/* // For server stats logging
 client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
   var guild = oldMember.guild;
@@ -200,6 +170,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
       if(error) throw error;
     })
   }
-})
+}) */
 
 client.login(token);
