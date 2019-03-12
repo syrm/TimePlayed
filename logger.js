@@ -64,7 +64,6 @@ updatePremiumGuilds();
 setInterval(updatePremiumGuilds, 60000);
 
 function refresh() {
-  console.log("Refreshing...")
   tools.filterTerms(toCheck, function(accepted) {
     var toInsert = [];
     var toEnd = [];
@@ -100,7 +99,7 @@ function refresh() {
     connection.query("UPDATE playtime SET endDate=? WHERE userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
-          console.log("Done!")
+          setTimeout(refresh, 5000)
         })
       })
     })
@@ -114,7 +113,6 @@ client.on("ready", () => {
     console.log("Clearup done");
     console.log("Started logging")
     refresh()
-    setInterval(refresh, 5000)
   })
 });
 
