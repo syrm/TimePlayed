@@ -15,36 +15,38 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function clearup(callback) {
-  connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
-    var toEnd = [];
-    var toInsert = [];
-    results.forEach(result => {
-      var user = client.users.get(result.userID);
-      if(!user) return;
-      if(!user.presence.game) {
-        toEnd.push(user.id);
-      } else if(user.presence.game.name != result.game) {
-        toEnd.push(user.id);
-        toInsert.push([user.id, user.presence.game.name, new Date()]);
-      }
-    })
-    if(toEnd.length > 0 && toInsert.length > 0) {
-      connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+  connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
+    connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
+      var toEnd = [];
+      var toInsert = [];
+      results.forEach(result => {
+        var user = client.users.get(result.userID);
+        if(!user) return;
+        if(!user.presence.game) {
+          toEnd.push(user.id);
+        } else if(user.presence.game.name != result.game) {
+          toEnd.push(user.id);
+          toInsert.push([user.id, user.presence.game.name, new Date()]);
+        }
+      })
+      if(toEnd.length > 0 && toInsert.length > 0) {
+        connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+          connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
+            callback()
+          })
+        })
+      } else if(toEnd.length > 0) {
+        connection.query(`UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+          callback()
+        })
+      } else if(toInsert.length > 0) {
         connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
           callback()
         })
-      })
-    } else if(toEnd.length > 0) {
-      connection.query(`UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
-        callback()
-      })
-    } else if(toInsert.length > 0) {
-      connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
-        callback()
-      })
-    } else {
-      callback();
-    }
+      } else {
+        callback();
+      }
+    })
   })
 }
 
@@ -126,7 +128,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
   toCheck.push([oldMember, newMember, new Date()])
 })
 
-/* // For server stats logging
+// For server stats logging
 client.on("presenceUpdate", (oldMember, newMember) => {
   if(oldMember.user.bot) return;
   var guild = oldMember.guild;
@@ -160,6 +162,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
       if(error) throw error;
     })
   }
-}) */
+})
 
 client.login(token);
