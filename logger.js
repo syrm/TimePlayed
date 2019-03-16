@@ -30,7 +30,7 @@ function clearup(callback) {
         }
       })
       if(toEnd.length > 0 && toInsert.length > 0) {
-        connection.query(`UPDATE playtime SET endDate=? WHERE userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
+        connection.query(`UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
           connection.query(`INSERT INTO playtime (userID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
             callback()
           })
