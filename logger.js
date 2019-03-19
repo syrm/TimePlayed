@@ -55,15 +55,28 @@ var premiumGuilds = [];
 function updatePremiumGuilds() {
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
     if(!results) return;
-    premiumGuilds = [];
-    results.forEach(result => {
-        premiumGuilds.push(result.guildID);
-    })
+    premiumGuilds = results.map(e => e.guildID);
     console.log("Premium list updated");
+    setTimeout(updatePremiumGuilds, 60000);
   })
 }
 updatePremiumGuilds();
-setInterval(updatePremiumGuilds, 60000);
+
+function updateUserGuilds() {
+  var userGuilds = [];
+  client.guilds.forEach(guild => {
+    guild.members.forEach(member => {
+      userGuilds.push([member.id, guild.id])
+    })
+  })
+  connection.query("DELETE FROM userGuilds", function(error, results, fields) {
+    connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
+      if(error) throw error;
+      console.log("User-guild relations updated")
+      setInterval(updateUserGuilds, 300000)
+    })
+  })
+}
 
 function refresh() {
   tools.filterTerms(toCheck, function(accepted) {
@@ -111,6 +124,8 @@ function refresh() {
 }
 
 client.on("ready", () => {
+  console.log("Client ready")
+  updateUserGuilds();
   console.log("Clearing up restart differences...");
   clearup(function() {
     console.log("Clearup done");

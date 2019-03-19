@@ -201,69 +201,46 @@ async function purge(purgeLimit, channel) {
 
 // ROLE AWARDS
 function updateRoles() {
-  console.log("Checking for role awards...")
-  var guilds = [];
-  console.time("Updating role awards took");
-  connection.query("SELECT * FROM roleAwards", function(error, allAwards, fields) {
-    client.guilds.forEach(guild => {
-      var awards = allAwards.filter(e => e.guildID == guild.id)
-      awards.forEach(award => {
-        if(guilds.some(e => e.guildID == guild.id && e.game == award.game && e.since == award.per) == false) {
-          // If the guild, same game and since isn't already in the list, push to guilds
-          var idList = []
-          guild.members.forEach(member => {
-            idList.push(member.id)
-          })
-          guilds.push({guildID: guild.id, game: award.game, since: award.per, ids: idList})
-        }
-      })
+  console.log("Updating role awards...")
+  var q = `
+  SELECT
+  playtime.userID AS userID,
+  roleAwards.guildID AS guildID,
+  roleAwards.roleID AS roleID,
+  IF(SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) > roleAwards.per, 1, 0) AS assign
+
+FROM
+    playtime
+
+INNER JOIN roleAwards ON playtime.userID IN (SELECT userID FROM userGuilds WHERE guildID=roleAwards.guildID)
+
+WHERE playtime.game = roleAwards.game
+
+GROUP BY playtime.userID, playtime.game, roleAwards.per`
+
+  connection.query(q, function(error, toAssign, fields) {
+    toAssign.forEach(obj => {
+      var guild = client.guilds.get(obj.guildID)
+      if(!guild) return;
+      var member = guild.members.get(obj.userID)
+      if(!member) return;
+      var role = guild.roles.get(obj.roleID)
+      if(!role) return;
+      var assign;
+      if(obj.assign == 1) assign = true;
+      if(obj.assign == 0) assign = false;
+      if(member.roles.get(role.id) && !assign) {
+        console.log(`Removed ${member.user.tag} from the ${role.name} role in ${guild.name}`)
+        member.removeRole(role)
+        .catch(err => console.log("Perm error"))
+        
+      } else if(!member.roles.get(role.id) && assign) {
+        console.log(`Added ${member.user.tag} to the ${role.name} role in ${guild.name}`)
+        member.addRole(role)
+        .catch(err => console.log("Perm error"))
+      }
     })
-    tools.bulkTimeplayedCustomSince(guilds, function(results) {
-      var addCount = 0
-      var removeCount = 0
-      client.guilds.forEach(guild => {
-        var awards = allAwards.filter(e => e.guildID == guild.id)
-        awards.forEach(award => {
-          var foundIndex;
-          results.forEach(function(result, index) {
-            if(result.guildID == guild.id && result.game == award.game && result.since == award.per) {
-              foundIndex = index;
-            }
-          })
-          if(foundIndex == undefined) return;
-          guild.members.forEach(member => {
-            var index = results[foundIndex].results.map(e => {return e.id}).indexOf(member.id)
-            var userResult = results[foundIndex].results[index]
-            var role = guild.roles.get(award.roleID)
-            var highestBotRole = guild.me.roles.sort(function(a, b) {
-              return a.position < b.position
-            }).first()
-            if(index != -1 && role != undefined) {
-              if(guild.me.hasPermission("MANAGE_ROLES") == false || role.position >= highestBotRole.position) return;
-              if(member.roles.get(award.roleID)) {
-                if(userResult.seconds  < award.time) {
-                  // Remove role/send message
-                  member.removeRole(role)
-                  .catch(err => console.log(err))
-                  removeCount++
-                  console.log(`Removed ${member.displayName} from the ${role.name} role.`)
-                }
-              } else {
-                if(userResult.seconds > award.time) {
-                  // Add role/send message
-                  member.addRole(role)
-                  .catch(err => console.log(err))
-                  addCount++
-                  console.log(`Added ${member.displayName} to the ${role.name} role.`)
-                }
-              }
-            }
-          })
-        })
-      })
-      console.timeEnd("Updating role awards took");
-      console.log(`Done! Removed ${removeCount} member(s) from roles/added ${addCount} member(s) to roles`)
-    })
+      console.log(`Done!`)
   })
     
 }
