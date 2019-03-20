@@ -207,7 +207,7 @@ function updateRoles() {
   playtime.userID AS userID,
   roleAwards.guildID AS guildID,
   roleAwards.roleID AS roleID,
-  IF(SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) > roleAwards.per, 1, 0) AS assign
+  IF(SUM(TIMESTAMPDIFF(SECOND,startDate, IFNULL(endDate, NOW()))) > roleAwards.time, 1, 0) AS assign
 
 FROM
     playtime
@@ -215,6 +215,7 @@ FROM
 INNER JOIN roleAwards ON playtime.userID IN (SELECT userID FROM userGuilds WHERE guildID=roleAwards.guildID)
 
 WHERE playtime.game = roleAwards.game
+AND playtime.startDate > date_sub(NOW(), INTERVAL roleAwards.per SECOND)
 
 GROUP BY playtime.userID, playtime.game, roleAwards.per`
 
