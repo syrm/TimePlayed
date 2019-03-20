@@ -216,6 +216,7 @@ INNER JOIN roleAwards ON playtime.userID IN (SELECT userID FROM userGuilds WHERE
 
 WHERE playtime.game = roleAwards.game
 AND playtime.startDate > date_sub(NOW(), INTERVAL roleAwards.per SECOND)
+AND userID NOT IN (SELECT userID FROM privateUsers)
 
 GROUP BY playtime.userID, playtime.game, roleAwards.per`
 
