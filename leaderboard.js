@@ -218,7 +218,7 @@ WHERE playtime.game = roleAwards.game
 AND playtime.startDate > date_sub(NOW(), INTERVAL roleAwards.per SECOND)
 AND userID NOT IN (SELECT userID FROM privateUsers)
 
-GROUP BY playtime.userID, playtime.game, roleAwards.per`
+GROUP BY playtime.userID, playtime.game, roleAwards.roleID`
 
   connection.query(q, function(error, toAssign, fields) {
     toAssign.forEach(obj => {
