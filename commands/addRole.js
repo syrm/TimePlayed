@@ -35,7 +35,7 @@ module.exports = function(obj) {
 
           // Check if the role is lower than the highest bot role
           var highestBotRole = message.guild.me.roles.sort(function(a, b) {
-            return a.position < b.position
+            return b.position-a.position;
           }).first()
           if(role.position >= highestBotRole.position) return message.reply(lang.commands.addRole.roleTooHigh)
   
