@@ -115,7 +115,9 @@ function refresh() {
     connection.query("UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
-          setTimeout(refresh, 5000)
+          connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
+            setTimeout(refresh, 5000)
+          })
         })
       })
     })
@@ -127,10 +129,20 @@ client.on("ready", () => {
   console.log("Client ready")
   updateUserGuilds();
   console.log("Clearing up restart differences...");
-  clearup(function() {
-    console.log("Clearup done");
-    console.log("Started logging")
-    refresh()
+  connection.query("SELECT date FROM lastRefresh ORDER BY date ASC", function(error, results, fields) {
+    var date = results[0].date;
+    var diffMs = (new Date() - date);
+    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+    if(diffMins < 10 && diffMins >= 0) {
+      clearup(function() {
+        console.log("Clearup done");
+        console.log("Started logging")
+        refresh()
+      })
+    } else {
+      console.log("Clearup cancelled (more than 10 minute difference)")
+      refresh()
+    }
   })
 });
 
