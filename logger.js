@@ -141,7 +141,11 @@ client.on("ready", () => {
       })
     } else {
       console.log("Clearup cancelled (more than 10 minute difference)")
-      refresh()
+      connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
+        connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+          refresh()
+        })
+      })
     }
   })
 });
