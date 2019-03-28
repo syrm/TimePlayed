@@ -214,7 +214,11 @@ FROM
 
 INNER JOIN roleAwards ON playtime.userID IN (SELECT userID FROM userGuilds WHERE guildID=roleAwards.guildID)
 
-WHERE playtime.game = roleAwards.game
+WHERE (
+	SUBSTRING_INDEX(SUBSTRING_INDEX(roleAwards.game, '|', 1), '|', -1) = playtime.game
+    OR SUBSTRING_INDEX(SUBSTRING_INDEX(roleAwards.game, '|', 2), '|', -1) = playtime.game
+    OR SUBSTRING_INDEX(SUBSTRING_INDEX(roleAwards.game, '|', 3), '|', -1) = playtime.game
+)
 AND playtime.startDate > date_sub(NOW(), INTERVAL roleAwards.per SECOND)
 AND userID NOT IN (SELECT userID FROM privateUsers)
 
