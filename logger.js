@@ -54,6 +54,7 @@ var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+    if(error) throw error;
     if(!results) return;
     premiumGuilds = results.map(e => e.guildID);
     console.log("Premium list updated");
@@ -116,6 +117,7 @@ function refresh() {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
           connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
+            if(error) throw error;
             setTimeout(refresh, 5000)
           })
         })
