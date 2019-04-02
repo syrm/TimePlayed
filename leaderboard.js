@@ -259,6 +259,8 @@ client.on("ready", () => {
   setInterval(updateRankingChannel, 60000);
 })
 
-client.on('error', console.log("Connection failed"));
+client.on('error', function() {
+  console.log("Connection failed")
+});
 
 client.login(token)

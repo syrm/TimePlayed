@@ -197,6 +197,8 @@ client.on("presenceUpdate", (oldMember, newMember) => {
   }
 })
 
-client.on('error', console.log("Connection failed"));
+client.on('error', function() {
+  console.log("Connection failed")
+});
 
 client.login(token);
