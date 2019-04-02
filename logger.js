@@ -197,4 +197,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
   }
 })
 
+client.on('error', console.error);
+
 client.login(token);

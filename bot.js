@@ -327,4 +327,6 @@ client.on("message", message => {
 
 })
 
+client.on('error', console.error);
+
 client.login(token).catch(err => console.log(err))
