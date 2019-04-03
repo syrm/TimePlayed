@@ -2,17 +2,8 @@ const Discord = require("discord.js");
 const keys = require('./keys.json')
 const token = keys.botToken;
 const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fetchAllMembers: true});
-const mysql = require("mysql")
 const tools = require('./tools')
-var connection = mysql.createConnection({
-  host: keys.mysqlhost,
-  user: keys.mysqlusername,
-  password: keys.mysqlpasswd,
-  database: 'timeplayed',
-  supportBigNumbers: true,
-  charset: 'utf8mb4'
-});
-connection.connect();
+var connection = require('./tools/connection.js');
 
 function clearup(callback) {
   connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
