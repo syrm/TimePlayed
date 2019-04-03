@@ -54,7 +54,7 @@ function updatePremiumGuilds() {
 }
 updatePremiumGuilds();
 
-function updateUserGuilds() {
+function updateUserGuilds(callback) {
   console.log("Updating user-guild relations...")
   var userGuilds = [];
   client.guilds.forEach(guild => {
@@ -66,6 +66,7 @@ function updateUserGuilds() {
     connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
       if(error) throw error;
       console.log("User-guild relations updated")
+      if(callback) callback();
       setInterval(updateUserGuilds, 300000)
     })
   })
@@ -121,27 +122,28 @@ function refresh() {
 
 client.on("ready", () => {
   console.log("Client ready")
-  updateUserGuilds();
-  console.log("Clearing up restart differences...");
-  connection.query("SELECT date FROM lastRefresh ORDER BY date ASC", function(error, results, fields) {
-    var date = results[0].date;
-    var diffMs = (new Date() - date);
-    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-    if(diffMins < 10 && diffMins >= 0) {
-      clearup(function() {
-        console.log("Clearup done");
-        console.log("Started logging")
-        refresh()
-      })
-    } else {
-      console.log("Clearup cancelled (more than 10 minute difference)")
-      connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
-        connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+  updateUserGuilds(function() {
+    console.log("Clearing up restart differences...");
+    connection.query("SELECT date FROM lastRefresh ORDER BY date ASC", function(error, results, fields) {
+      var date = results[0].date;
+      var diffMs = (new Date() - date);
+      var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+      if(diffMins < 10 && diffMins >= 0) {
+        clearup(function() {
+          console.log("Clearup done");
+          console.log("Started logging")
           refresh()
         })
-      })
-    }
-  })
+      } else {
+        console.log("Clearup cancelled (more than 10 minute difference)")
+        connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
+          connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+            refresh()
+          })
+        })
+      }
+    })
+  });
 });
 
 // For regular logging
