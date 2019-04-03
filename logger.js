@@ -55,6 +55,7 @@ function updatePremiumGuilds() {
 updatePremiumGuilds();
 
 function updateUserGuilds() {
+  console.log("Updating user-guild relations...")
   var userGuilds = [];
   client.guilds.forEach(guild => {
     guild.members.forEach(member => {
