@@ -45,7 +45,7 @@ var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
-    if(error) throw error;
+    if(error) return console.log("Conn error on updating premium guilds")
     if(!results) return;
     premiumGuilds = results.map(e => e.guildID);
     console.log("Premium list updated");
@@ -64,7 +64,7 @@ function updateUserGuilds(callback) {
   })
   connection.query("DELETE FROM userGuilds", function(error, results, fields) {
     connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
-      if(error) throw error;
+      if(error) return console.log("Conn error");
       console.log("User-guild relations updated")
       if(callback) callback();
       setInterval(updateUserGuilds, 300000)
@@ -110,13 +110,13 @@ function refresh() {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
           connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
-            if(error) throw error;
+            if(error) return;
             setTimeout(refresh, 5000)
+            toCheck = []
           })
         })
       })
     })
-    toCheck = []
   })
 }
 
@@ -138,6 +138,7 @@ client.on("ready", () => {
         console.log("Clearup cancelled (more than 10 minute difference)")
         connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
           connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+            console.log("Started logging")
             refresh()
           })
         })
