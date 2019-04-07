@@ -149,10 +149,10 @@ client.on("message", message => {
     guildID = message.guild.id
     guildName = message.guild.name
   }
+  if(connection.state == 'disconnected') {
+    return message.reply("Sorry, I currently can't reach the playtime database due to connection problems. Please try again in a moment, and if this error keeps occurring report it in my support server (http://support.timeplayed.xyz).")
+  }
   tools.getGuildConfig(guildID, function(guildConf) {
-    if(!guildConf) {
-      return message.reply("Sorry, I currently can't reach the playtime database due to connection problems. Please try again in a moment, and if this error keeps occurring report it in my support server (http://support.timeplayed.xyz).")
-    }
     var contentCMD;
     if(message.content.startsWith(`<@${client.user.id}>`)) {
       contentCMD = message.content.replace(/  +/g, ' ').replace(`<@${client.user.id}>`, "").split(/ +/g)[1]

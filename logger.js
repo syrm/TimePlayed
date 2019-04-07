@@ -73,6 +73,11 @@ function updateUserGuilds(callback) {
 }
 
 function refresh() {
+  if(connection.state == 'disconnected') {
+    console.log("Database disconnected, retrying in 5 seconds")
+    setTimeout(refresh, 5000);
+    return;
+  }
   tools.filterTerms(toCheck, function(accepted) {
     var toInsert = [];
     var toEnd = [];
@@ -110,8 +115,8 @@ function refresh() {
       connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
           connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
-            if(error) return;
             setTimeout(refresh, 5000)
+            if(error) return;
             toCheck = []
           })
         })
