@@ -5,6 +5,10 @@ const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fe
 const tools = require('./tools')
 var connection = require('./tools/connection.js');
 
+connection.ping(function(err) {
+  if(err) throw err;
+})
+
 function clearup(callback) {
   connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
     connection.query(`SELECT * FROM playtime WHERE endDate IS NULL`, function(error, results, fields) {
@@ -44,86 +48,98 @@ function clearup(callback) {
 var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
-  if(connection.state == 'disconnected') {
-    console.log("Database disconnected, retrying updatePremiumGuilds in 5 seconds")
-    return setTimeout(updatePremiumGuilds, 5000);
-  }
-  connection.query("SELECT guildID FROM premium", function(error, results, fields) {
-    if(error) return console.log("Conn error on updating premium guilds")
-    if(!results) return;
-    premiumGuilds = results.map(e => e.guildID);
-    console.log("Premium list updated");
-    setTimeout(updatePremiumGuilds, 60000);
+  // Check connection health
+  connection.ping(function(err) {
+    if(err) {
+      console.log("Database disconnected, retrying updatePremiumGuilds in 10 seconds")
+      return setTimeout(updatePremiumGuilds, 5000);
+    }
+    // If connection is healthy
+    connection.query("SELECT guildID FROM premium", function(error, results, fields) {
+      if(!results) return;
+      premiumGuilds = results.map(e => e.guildID);
+      console.log("Premium list updated");
+      setTimeout(updatePremiumGuilds, 60000);
+    })
   })
+  
 }
 updatePremiumGuilds();
 
 function updateUserGuilds(callback) {
-  if(connection.state == 'disconnected') {
-    console.log("Database disconnected, retrying updateUserGuilds in 5 seconds")
-    return setTimeout(updateUserGuilds, 5000);
-  }
   console.log("Updating user-guild relations...")
-  var userGuilds = [];
-  client.guilds.forEach(guild => {
-    guild.members.forEach(member => {
-      userGuilds.push([member.id, guild.id])
+  // Check connection health
+  connection.ping(function(err) {
+    if(err) {
+      console.log("Database disconnected, retrying updateUserGuilds in 10 seconds")
+      return setTimeout(updateUserGuilds, 5000);
+    }
+    // If connection is healthy
+    var userGuilds = [];
+    client.guilds.forEach(guild => {
+      guild.members.forEach(member => {
+        userGuilds.push([member.id, guild.id])
+      })
     })
-  })
-  connection.query("DELETE FROM userGuilds", function(error, results, fields) {
-    connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
-      console.log("User-guild relations updated")
-      if(callback) callback();
-      setInterval(updateUserGuilds, 300000)
+    connection.query("DELETE FROM userGuilds", function(error, results, fields) {
+      connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
+        console.log("User-guild relations updated")
+        if(callback) callback();
+        setInterval(updateUserGuilds, 300000)
+      })
     })
   })
 }
 
 function refresh() {
-  if(connection.state == 'disconnected') {
-    console.log("Database disconnected, retrying refresh in 5 seconds")
-    return setTimeout(refresh, 5000);
-  }
-  tools.filterTerms(toCheck, function(accepted) {
-    var toInsert = [];
-    var toEnd = [];
-    var toLastOnline = [];
-    accepted.forEach(arr => {
-      var oldMember = arr[0];
-      var newMember = arr[1];
-      var date = arr[2];
-      if(newMember.presence.game) {
-        // Return if game still the same
-        if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-        // If still playing a game
-        if(oldMember.presence.game) {
-          // If game changed
-          console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+  // Check connection health
+  connection.ping(function(err) {
+    if(err) {
+      console.log("Database disconnected, retrying refresh in 10 seconds")
+      return setTimeout(refresh, 5000);
+    }
+    // If connection is healthy
+    tools.filterTerms(toCheck, function(accepted) {
+      var toInsert = [];
+      var toEnd = [];
+      var toLastOnline = [];
+      accepted.forEach(arr => {
+        var oldMember = arr[0];
+        var newMember = arr[1];
+        var date = arr[2];
+        if(newMember.presence.game) {
+          // Return if game still the same
+          if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
+          // If still playing a game
+          if(oldMember.presence.game) {
+            // If game changed
+            console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+            toEnd.push(oldMember.id)
+            toInsert.push([oldMember.id, date, newMember.presence.game.name])
+          } else {
+            // If started playing 
+            console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+            toInsert.push([oldMember.id, date, newMember.presence.game.name])
+          }
+        } else if(oldMember.presence.game) {
+          // If stopped playing
+          console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
           toEnd.push(oldMember.id)
-          toInsert.push([oldMember.id, date, newMember.presence.game.name])
-        } else {
-          // If started playing 
-          console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
-          toInsert.push([oldMember.id, date, newMember.presence.game.name])
         }
-      } else if(oldMember.presence.game) {
-        // If stopped playing
-        console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
-        toEnd.push(oldMember.id)
-      }
-      if(oldMember.presence.status != newMember.presence.status && newMember.presence.status == "offline") {
-        console.log(`${oldMember.displayName} went offline`)
-        toLastOnline.push(oldMember.id)
-      }
-    })
-
-    connection.query("UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
-      connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
-        connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
-          connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
-            setTimeout(refresh, 5000)
-            if(error) return;
-            toCheck = []
+        if(oldMember.presence.status != newMember.presence.status && newMember.presence.status == "offline") {
+          console.log(`${oldMember.displayName} went offline`)
+          toLastOnline.push(oldMember.id)
+        }
+      })
+  
+      connection.query("UPDATE playtime SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
+        connection.query("INSERT INTO playtime (userID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
+          connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
+            connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
+              setTimeout(refresh, 5000)
+              if(error) return;
+              toCheck = []
+            })
           })
         })
       })
