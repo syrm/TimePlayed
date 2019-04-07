@@ -44,6 +44,10 @@ function clearup(callback) {
 var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
+  if(connection.state == 'disconnected') {
+    console.log("Database disconnected, retrying updatePremiumGuilds in 5 seconds")
+    return setTimeout(updatePremiumGuilds, 5000);
+  }
   connection.query("SELECT guildID FROM premium", function(error, results, fields) {
     if(error) return console.log("Conn error on updating premium guilds")
     if(!results) return;
@@ -55,6 +59,10 @@ function updatePremiumGuilds() {
 updatePremiumGuilds();
 
 function updateUserGuilds(callback) {
+  if(connection.state == 'disconnected') {
+    console.log("Database disconnected, retrying updateUserGuilds in 5 seconds")
+    return setTimeout(updateUserGuilds, 5000);
+  }
   console.log("Updating user-guild relations...")
   var userGuilds = [];
   client.guilds.forEach(guild => {
@@ -64,7 +72,6 @@ function updateUserGuilds(callback) {
   })
   connection.query("DELETE FROM userGuilds", function(error, results, fields) {
     connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
-      if(error) return console.log("Conn error");
       console.log("User-guild relations updated")
       if(callback) callback();
       setInterval(updateUserGuilds, 300000)
@@ -74,9 +81,8 @@ function updateUserGuilds(callback) {
 
 function refresh() {
   if(connection.state == 'disconnected') {
-    console.log("Database disconnected, retrying in 5 seconds")
-    setTimeout(refresh, 5000);
-    return;
+    console.log("Database disconnected, retrying refresh in 5 seconds")
+    return setTimeout(refresh, 5000);
   }
   tools.filterTerms(toCheck, function(accepted) {
     var toInsert = [];
@@ -198,7 +204,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
 })
 
 client.on('error', function() {
-  console.log("Connection failed")
+  console.log("Discord connection failed")
 });
 
 client.login(token);
