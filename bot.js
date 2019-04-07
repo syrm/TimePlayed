@@ -138,7 +138,6 @@ client.on("guildDelete", guild => {
 client.on("message", message => {
   if(message.author.bot) return;
   var lang = JSON.parse(JSON.stringify(en));
-  if(message.channel.type == "group") return message.reply(lang.errors.noGroupPM)
   var guildID;
   var guildName;
   var PM = message.channel.type == "dm"
@@ -152,7 +151,40 @@ client.on("message", message => {
   // Check connection health
   connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
     if(err) {
-      return message.reply("Sorry, I currently can't reach the playtime database due to connection problems. Please try again in a moment, and if this error keeps occurring report it in my support server (http://support.timeplayed.xyz).")
+      // Return if no command
+
+      // Extract command part
+      var contentCMD;
+      if(message.content.startsWith(`<@${client.user.id}>`)) {
+        contentCMD = message.content.replace(/  +/g, ' ').replace(`<@${client.user.id}>`, "").split(/ +/g)[1]
+        arg = message.content.replace(/  +/g, ' ').split(/ +/g).slice(2)
+      } else if(PM && !message.content.startsWith("!!")) {
+        contentCMD = message.content.replace(/  +/g, ' ').split(/ +/g)[0]
+        arg = message.content.replace(/  +/g, ' ').split(/ +/g).slice(1)
+      } else {
+        contentCMD = message.content.replace(/  +/g, ' ').replace("!!", "").split(/ +/g)[0];
+        arg = message.content.replace(/  +/g, ' ').split(/ +/g).slice(1)
+      }
+
+      // Convert aliases to a regular command
+      var found = false;
+      var command;
+      var counter = 0;
+      Object.values(aliases).forEach(value => {
+        for(var i = 0; i < value.length; i++) {
+          if(contentCMD && contentCMD.toLowerCase() == value[i]) {
+            found = true;
+            command = Object.keys(aliases)[counter]
+          }
+        }
+        counter ++;
+      })
+      if(!found && contentCMD) command = contentCMD.toLowerCase();
+      
+      if(commands.indexOf(command) != -1) {
+        return message.reply("Sorry, I currently can't reach the playtime database due to connection problems. Please try again in a moment, and if this error keeps occurring report it in my support server (http://support.timeplayed.xyz).")
+        .catch(err => console.log(`Error sending database failure message`))
+      }
     }
     tools.getGuildConfig(guildID, function(guildConf) {
       var contentCMD;
