@@ -150,7 +150,7 @@ client.on("message", message => {
     guildName = message.guild.name
   }
   // Check connection health
-  connection.ping(function(err) {
+  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
     if(err) {
       return message.reply("Sorry, I currently can't reach the playtime database due to connection problems. Please try again in a moment, and if this error keeps occurring report it in my support server (http://support.timeplayed.xyz).")
     }

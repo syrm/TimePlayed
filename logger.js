@@ -5,7 +5,7 @@ const client = new Discord.Client({disableEveryone: true, autoReconnect:true, fe
 const tools = require('./tools')
 var connection = require('./tools/connection.js');
 
-connection.ping(function(err) {
+connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
   if(err) throw err;
 })
 
@@ -49,7 +49,7 @@ var toCheck = []
 var premiumGuilds = [];
 function updatePremiumGuilds() {
   // Check connection health
-  connection.ping(function(err) {
+  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
     if(err) {
       console.log("Database disconnected, retrying updatePremiumGuilds in 10 seconds")
       return setTimeout(updatePremiumGuilds, 5000);
@@ -69,7 +69,7 @@ updatePremiumGuilds();
 function updateUserGuilds(callback) {
   console.log("Updating user-guild relations...")
   // Check connection health
-  connection.ping(function(err) {
+  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
     if(err) {
       console.log("Database disconnected, retrying updateUserGuilds in 10 seconds")
       return setTimeout(updateUserGuilds, 5000);
@@ -93,7 +93,7 @@ function updateUserGuilds(callback) {
 
 function refresh() {
   // Check connection health
-  connection.ping(function(err) {
+  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
     if(err) {
       console.log("Database disconnected, retrying refresh in 10 seconds")
       return setTimeout(refresh, 5000);
