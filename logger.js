@@ -123,7 +123,7 @@ function refresh() {
           // If still playing a game
           if(oldMember.presence.game) {
             // If game changed
-            console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+            console.log(`NM: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
             toEnd.push(oldMember.id)
             toInsert.push([oldMember.id, date, newMember.presence.game.name])
           } else {
