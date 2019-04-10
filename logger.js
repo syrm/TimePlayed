@@ -128,16 +128,16 @@ function refresh() {
             toInsert.push([oldMember.id, date, newMember.presence.game.name])
           } else {
             // If started playing 
-            console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+            console.log(`NM: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
             toInsert.push([oldMember.id, date, newMember.presence.game.name])
           }
         } else if(oldMember.presence.game) {
           // If stopped playing
-          console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+          console.log(`NM: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
           toEnd.push(oldMember.id)
         }
         if(oldMember.presence.status != newMember.presence.status && newMember.presence.status == "offline") {
-          console.log(`${oldMember.displayName} went offline`)
+          console.log(`NM: ${oldMember.displayName} went offline`)
           toLastOnline.push(oldMember.id)
         }
       })
@@ -176,17 +176,17 @@ function refreshGuildStats() {
         // If still playing a game
         if(oldMember.presence.game) {
           // If game changed
-          console.log(`GS: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name} in ${guildID} user ${oldMember.id})`)
+          console.log(`GS: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name} in ${guildID})`)
           toEnd.push(oldMember.id)
           toInsert.push([oldMember.id, guildID, date, newMember.presence.game.name])
         } else {
           // If started playing
-          console.log(`GS: ${oldMember.displayName} started playing ${newMember.presence.game.name} (in ${guildID} user ${oldMember.id})`)
+          console.log(`GS: ${oldMember.displayName} started playing ${newMember.presence.game.name} (in ${guildID})`)
           toInsert.push([oldMember.id, guildID, date, newMember.presence.game.name])
         }
       } else if(oldMember.presence.game) {
         // If stopped playing
-        console.log(`GS: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name} (in ${guildID} user ${oldMember.id})`)
+        console.log(`GS: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name} (in ${guildID})`)
         toEnd.push(oldMember.id)
       }
     })
