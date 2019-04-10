@@ -174,6 +174,10 @@ function refreshGuildStats() {
       var date = arr[3];
       if(newMember.presence.game) {
         // If still playing a game
+
+        // Return if game still same
+        if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
+
         if(oldMember.presence.game) {
           // If game changed
           console.log(`GS: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name} in ${guildID})`)
