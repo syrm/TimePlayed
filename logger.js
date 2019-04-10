@@ -147,7 +147,6 @@ function refresh() {
           connection.query("INSERT INTO lastOnline (userID, date) VALUES (?, ?) ON DUPLICATE KEY UPDATE date=?", [toLastOnline, new Date(), new Date()], function(error, results, fields) {
             connection.query("UPDATE lastRefresh SET date=NOW();", function(error, results, fields) {
               setTimeout(refresh, 5000)
-              if(error) return;
               toCheck = []
             })
           })
@@ -195,7 +194,6 @@ function refreshGuildStats() {
     connection.query("UPDATE guildStats SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
       connection.query("INSERT INTO guildStats (userID, guildID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
         setTimeout(refreshGuildStats, 5000)
-        if(error) return;
         toCheckGuildStats = []
       })
     })
