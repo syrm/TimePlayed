@@ -255,7 +255,7 @@ client.on("presenceUpdate", (oldMember, newMember) => {
   // Return if same
   if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
 
-  toCheckGuildStats.push(oldMember, newMember, guild.id, new Date());
+  toCheckGuildStats.push([oldMember, newMember, guild.id, new Date()]);
 
 })
 
