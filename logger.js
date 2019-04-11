@@ -75,31 +75,6 @@ function updatePremiumGuilds() {
 }
 updatePremiumGuilds();
 
-function updateUserGuilds(callback) {
-  console.log("Updating user-guild relations...")
-  // Check connection health
-  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
-    if(err) {
-      console.log("Database disconnected, retrying updateUserGuilds in 10 seconds")
-      return setTimeout(updateUserGuilds, 5000);
-    }
-    // If connection is healthy
-    var userGuilds = [];
-    client.guilds.forEach(guild => {
-      guild.members.forEach(member => {
-        userGuilds.push([member.id, guild.id])
-      })
-    })
-    connection.query("DELETE FROM userGuilds", function(error, results, fields) {
-      connection.query("INSERT INTO userGuilds (userID, guildID) VALUES ?", [userGuilds], function(error, results, fields) {
-        console.log("User-guild relations updated")
-        if(callback) callback();
-        setInterval(updateUserGuilds, 300000)
-      })
-    })
-  })
-}
-
 var toCheck = [];
 function refresh() {
   // Check connection health
@@ -206,34 +181,32 @@ function refreshGuildStats() {
 
 client.on("ready", () => {
   console.log("Client ready")
-  updateUserGuilds(function() {
-    console.log("Clearing up restart differences...");
-    connection.query("SELECT date FROM lastRefresh ORDER BY date ASC", function(error, results, fields) {
-      var date = results[0].date;
-      var diffMs = (new Date() - date);
-      var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-      if(diffMins < 20 && diffMins >= 0) {
-        clearup(function() {
-          console.log("Regular clearup done")
-          clearupGuildStats(function() {
-            console.log("Guildstat clearup done");
-            console.log("Started logging")
-            refresh()
-            refreshGuildStats()
-          })
+  console.log("Clearing up restart differences...");
+  connection.query("SELECT date FROM lastRefresh ORDER BY date ASC", function(error, results, fields) {
+    var date = results[0].date;
+    var diffMs = (new Date() - date);
+    var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+    if(diffMins < 20 && diffMins >= 0) {
+      clearup(function() {
+        console.log("Regular clearup done")
+        clearupGuildStats(function() {
+          console.log("Guildstat clearup done");
+          console.log("Started logging")
+          refresh()
+          refreshGuildStats()
         })
-      } else {
-        console.log("Clearup cancelled (more than 20 minute difference), deleting invalid data")
-        connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
-          connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
-            console.log("Started logging")
-            refresh()
-            refreshGuildStats()
-          })
+      })
+    } else {
+      console.log("Clearup cancelled (more than 20 minute difference), deleting invalid data")
+      connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
+        connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+          console.log("Started logging")
+          refresh()
+          refreshGuildStats()
         })
-      }
-    })
-  });
+      })
+    }
+  })
 });
 
 // For regular logging
