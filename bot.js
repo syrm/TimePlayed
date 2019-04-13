@@ -273,7 +273,7 @@ client.on("message", message => {
       }
       lang = bulkReplaceLang([["%be%", toBe], ["%have%", toHave], ["%person%", person], ["%possessive%", possessive], ["%prefix%", guildConf.prefix], ["%guildId%", guildID], ["%clientId%", client.user.id]], lang)
       if(handledArgs.game) lang = tools.replaceLang(/%game%+/g, handledArgs.game, lang)
-      if(command != "timeplayed") lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
+      if(command != "timeplayed" && command != "playing") lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
   
       var result;
       Object.keys(lang.commands).forEach(commandName => {
