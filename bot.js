@@ -109,11 +109,11 @@ client.on("ready", () => {
   }, 60000)
   if(!beta && !selfHost) {
     postStats()
-    setInterval(postStats, 1800000);
   }
 });
 
 client.on("guildCreate", guild => {
+  postStats()
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   var found = false;
   tools.getGuildConfig(guild.id, function(guildConf) {
@@ -130,6 +130,7 @@ client.on("guildCreate", guild => {
   log(`Joined a new server (current server count: ${client.guilds.size})`)
 });
 client.on("guildDelete", guild => {
+  postStats()
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
   log(`Left a server (current server count: ${client.guilds.size})`)
   console.log(`${Date()}: Left guild: ${guild.name}`)
