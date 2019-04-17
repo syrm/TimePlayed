@@ -254,9 +254,9 @@ GROUP BY playtime.userID, playtime.game, roleAwards.roleID`
 client.on("ready", () => {
   console.log("Ready!")
   updateRoles()
-  setInterval(updateRoles, 60000);
+  setInterval(updateRoles, 600000);
   updateRankingChannel();
-  setInterval(updateRankingChannel, 60000);
+  setInterval(updateRankingChannel, 600000);
 })
 
 client.on('error', function() {
