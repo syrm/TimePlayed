@@ -68,7 +68,7 @@ function updatePremiumGuilds() {
       if(!results) return;
       premiumGuilds = results.map(e => e.guildID);
       console.log("Premium list updated");
-      setTimeout(updatePremiumGuilds, 60000);
+      setTimeout(updatePremiumGuilds, 3600000);
     })
   })
   
