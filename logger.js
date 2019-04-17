@@ -238,4 +238,4 @@ client.on('error', function() {
   console.log("Discord connection failed")
 });
 
-client.login(token);
+client.login(token).catch(console.error);
