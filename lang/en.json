@@ -170,14 +170,6 @@
             "alreadyGlobal": "Your playtime is already set to public!",
             "choices": "What will your new privacy setting be? Choose from these 2 options and react with your choice:\n- 🇦 : Set your playtime to private (you can still view your own playtime)\n- 🇧 : Set your playtime back to public"
         },
-        "acceptMessage": {
-            "args": "",
-            "aliases": ["acceptmsg"],
-            "helpDescription": "Get a Terms of Service message everyone can react to",
-            "category": "Privacy commands",
-            "fullDescription": "This command sends a global accept message in the channel you run this command in. Everyone can react with ✅, and accept to the Terms of Service.\nYou could for example pin this message to your bot commands channel, so users can react to 1 message to accept instead of individually have to accept.",
-            "PMSupport": false
-        },
         "accept": {
             "args": "",
             "aliases": [],
