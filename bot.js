@@ -1,4 +1,5 @@
 // Made by xVaql#4581, all rights reserved
+// Light version
 const keys = require('./keys.json');
 var beta = keys.beta;
 var selfHost = keys.selfHost;
@@ -201,7 +202,7 @@ client.on("message", message => {
       }
   
       // Delete rankingChannel messages
-      if(`<#${message.channel.id}>` == guildConf.rankingChannel) return message.delete()
+      if(message.channel.id == guildConf.rankingChannel) return message.delete()
   
       // Check if message is a command
       
