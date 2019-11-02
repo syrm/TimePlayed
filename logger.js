@@ -97,22 +97,15 @@ client.on("ready", () => {
     var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
     if(diffMins < 20 && diffMins >= 0) {
       clearup(function() {
-        console.log("Regular clearup done")
-        clearupGuildStats(function() {
-          console.log("Guildstat clearup done");
-          console.log("Started logging")
-          refresh()
-          refreshGuildStats()
-        })
+        console.log("Clearup done")
+        refresh()
+        console.log("Started logging")
       })
     } else {
       console.log("Clearup cancelled (more than 20 minute difference), deleting invalid data")
-      connection.query("DELETE FROM guildStats WHERE endDate IS NULL", function(error, results, fields) {
-        connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
-          console.log("Started logging")
-          refresh()
-          refreshGuildStats()
-        })
+      connection.query("DELETE FROM playtime WHERE endDate IS NULL", function(error, results, fields) {
+        console.log("Started logging")
+        refresh()
       })
     }
   })
