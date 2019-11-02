@@ -4,6 +4,7 @@ module.exports = function(obj) {
     var message = obj.message;
     var handledArgs = obj.handledArgs;
     var lang = obj.lang;
+    if(!handledArgs.other) return message.channel.send("Please specify the game argument!")
     tools.lastPlayed(meantUser.id, handledArgs.other, function(result) {
         if(result == -1) return message.channel.send(lang.commands.timePlayed.noPlaytime)
         if(meantUser.presence.game && meantUser.presence.game.name.toLowerCase() == handledArgs.other.toLowerCase()) return message.channel.send(lang.commands.lastPlayed.rightNow)

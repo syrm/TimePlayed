@@ -5,13 +5,12 @@
         "noPMCommand": "I'm sorry, that command is not available in PM. To get a list of commands that are supported in PM, type `%prefix%help`.",
         "noSpeakPerms": "Hi there, I saw you were trying to run the `%message.content%` command in the `%message.guild.name%` server, but I don't have the permissions to speak there! Please ask a server admin to give me the `Send Messages` permission or try to run my commands in another channel.",
         "noBots": "Sorry, I don't log the playtime of bots!",
-        "premiumOnly": "Error: the leaderboard function is premium-only! To use this function, become a patreon at <https://www.patreon.com/TimePlayed>",
         "noRankingChannel": "Error: this server hasn't set a ranking channel! Please ask a server admin to run the `%prefix%setConfig rankingChannel (#channel)` command to set a ranking channel.",
         "noLeaderboardFile": "Sorry, I can't find this servers leaderboard. Please try again later or report this as a bug.",
         "mentionNotFound": "I don't share a server with the user you mentioned, so I can't log his playtime!",
         "noPMMention": "Sorry, I don't support mentions in PM. If you wish to get information about someone else, please run this command in a server I'm in.",
         "helpCommandNotFound": "I can't find the full description of the command you specified! Type `%prefix%help` to get a list of all my commands.",
-        "noPermission": "Sorry, you need the `administrator` permission in this server to do that!.",
+        "noPermission": "Sorry, you need the `Manage Guilds` permission in this server to do that!.",
         "tooMuchSince": "Please make the custom since not more than a 2 digit number! I can't handle more!",
         "firstTime": "Hi there! I see it's the first time you're using me.\nI'm TimePlayed, a bot that logs your playtime. I need your permission for this, so if you'd like me to log your playtime please accept to my Terms of Service.",
         "stillAccept": "Hi there! I see you have erased your playtime data, so to use my commands please still accept them.",
@@ -38,7 +37,7 @@
     "commands": {
         "timePlayed": {
             "args": "[@user] [time] [game]",
-            "aliases": ["tp", "playtime"],
+            "aliases": ["tp", "playtime", "top", "topp", "topgames", "gamestop", "topplayed"],
             "helpDescription": "View your playtime, of a specific game or in a specific time period",
             "category": "Playtime commands",
             "fullDescription": "This will give you information about someone's playtime (based on Discord presences). You can specify the time period (e.a. 10h/3d/10w) this information is measured, and specify a game. When no game is specified, you will get your playtime of the server's default game.",
@@ -55,20 +54,10 @@
             "dayNoInfo": "%possessiveUpper% data %have% only been logged since %startDateString%, so I can't show you this information!",
             "allTitle": "Total*",
             "all": "%personUpper% %have% played `%timePlayedTotal%` %game%",
-            "footer": "*%possessiveUpper% playtime is measured since %startDateString%"
-        },
-        "topPlayed": {
-            "args": "[@user] [time]",
-            "aliases": ["top", "topp", "topgames", "gamestop"],
-            "helpDescription": "Get a list of games you play the most",
-            "category": "Playtime commands",
-            "fullDescription": "This command gives you a list of games you (or someone) play(s) the most. You can specify the time period since when the information will be given.",
-            "PMSupport": true,
-            "playtimeCommand": true,
-            "noGame": "I don't excactly know what you mean by the `%arg%` argument. It could be two things:\n- If you are trying to specify a game: please use the `%prefix%timePlayed` command instead\n- If you're trying to specify a custom since time: please take a look at this page: <http://www.timeplayed.xyz/commands> or type `%prefix%help`",
+            "footer": "*%possessiveUpper% playtime is measured since %startDateString%",
             "noGameEver": "%possessiveUpper% %have%n't (according to Discord) ever played a game since I measured %possessive% playtime! If you think this is a mistake, please take a good look at <http://www.timeplayed.xyz/faq-support#noGame>\n(playtime measured since %startDateString%)\n",
             "noGamePeriod": "**%possessiveUpper% %have%n't played any game in that time period!**",
-            "title": "\n%possessiveUpper% most played games are:\n",
+            "titleTop": "\n%possessiveUpper% sare:\n",
             "titleCustomSince": "\n%customSince%, %possessive% most played games are:\n",
             "title2": "%personUpper% %have% played %hours% hours of games:",
             "titleCustomSince2": "%customSince%, %person% %have% played %hours% hours of games:",
@@ -87,7 +76,7 @@
             "moreThanTwenty": "**And %more% more people, but that would be too many to count!**"
         },
         "lastPlayed": {
-            "args": "[@user] [game]",
+            "args": "[@user] (game)",
             "aliases": [],
             "helpDescription": "Check when someone last played a game",
             "category": "Playtime commands",
@@ -108,14 +97,6 @@
             "gamePlaying": "%personUpper% %be% currently %type%",
             "presence": "%possessiveUpper% Discord presence is set to: **%presence%**",
             "noGame": "According to Discord %person% %be%n't playing a game"
-        },
-        "serverStats": {
-            "args": "[game|games-only] -[time|count]",
-            "aliases": ["guildstats", "serverinfo"],
-            "helpDescription": "Get some interesting stats of this server's playtime",
-            "category": "Playtime commands",
-            "fullDescription": "Coming soon",
-            "PMSupport": false
         },
         "help": {
             "args": "",
@@ -187,68 +168,17 @@
             "PMSupport": true,
             "confirmation": "Are you 100% sure?\nThis action will **erase ALL your data** from the playtime database, and I will stop logging your playtime.\nThis action can **NOT** be undone!\nReact with ✅ to confirm this action, to cancel, ignore this message."
         },
-        "setConfig": {
+        "setPrefix": {
             "args": "",
-            "aliases": ["sc", "settings", "setting", "setconf"],
+            "aliases": ["prefix", "settings", "setting", "setconf"],
             "helpDescription": "Change a value of the server config",
             "category": "Admin commands",
-            "fullDescriptionOld": "This command lets you change a config value. To get a list of available options, type `%prefix%showConfig`.\nHere's an example: if I want to change the server's prefix to `?` I'd have to run the command: `%prefix%setConfig prefix ?`\nPlease note that the config keys are **case sensitive**.",
             "fullDescription": "This command gives you a link to the TimePlayed Dashboard where you can [view/edit this server's config](http://www.timeplayed.xyz/dashboard/%guildId%).",
             "PMSupport": false,
-            "availableValues": {
-                "prefix": "string",
-                "rankingChannel": "textChannel",
-                "enableRankingMentions": "boolean",
-                "defaultGame": "string",
-                "leaderboardAmount": "number"
-            },
-            "noValidChannel": "I can't find the channel you're looking for. Either I can't read messages in the channel, or it's not a valid text channel.",
-            "noRankingPermissions": "Error: I don't have the sufficient permissions in the %channel% channel to send/manage my leaderboard. \nPlease give me the `%permission%` permission and run this command again.",
-            "moreThanTen": "Erro: the maximum leaderboard amount value is 10!",
-            "wrongDataType": "That's the wrong data type for that setting! The `%key%` setting should be a `%type%`",
-            "unknownSetting": "I don't know that setting!\nAvailable settings are:\n%availableSettings%\nPlease note that all keys (setting names) are case sensitive. Visit this page for more help: <https://goo.gl/q9voUa>",
-            "roleAwards": "To change role awards, please use the `%prefix%addRole` command. To view all role awards, use the `%prefix%showRoles` command.",
-            "success": "Success! I've set the setting %key% to: `%value%` succesfully!"
-        },
-        "showConfig": {
-            "args": "",
-            "aliases": ["showconf", "viewconfig", "viewconf", "viewsettings", "showsettings"],
-            "helpDescription": "View the server config",
-            "category": "Admin commands",
-            "fullDescription": "This command shows you the current server configuration. Can't be more clear than that :shrug:",
-            "PMSupport": false
-        },
-        "addRole": {
-            "args": "(@role/roleID/role Name) (time)/(time) [game]",
-            "aliases": ["addreward", "newreward", "newaward", "addaward"],
-            "helpDescription": "Automatically assign roles to users when they reach a specified amount of playtime in a period of time",
-            "category": "Admin commands",
-            "fullDescription": "This command adds a role award to the server, a specified role will be given when members of this server reach a specified amount of playtime, of a specified game in a specified period of time.\nThe first `(time)` of the `(time)/(time)` argument should be the amount of playtime users need to reach, the second `(time)` needs to be the period of time the playtime needs to be in.\nHere's an example: when I want to assign the Tryhard role to users when they play more than 10 hours per week Overwatch, I'll have to run the following command: `%prefix%addRole Tryhard 10h/week Overwatch`",
-            "PMSupport": false,
-            "noPermission": "I don't have the permission to assign roles to users! Please go to my role in the server settings, turn on the `Manage Roles` permission and run this command again.",
-            "cantFindRole": "I can't find the role you specified (%role%)! Please mention the role, give me the ID or give me the name of the role and run this command again.\nPlease note that the role names are **case sensitive**.\nIf you're having trouble adding a role award, you can very easily manage role awards on this server's online dashboard at <http://www.timeplayed.xyz/dashboard/%guildId%/role-awards>",
-            "threeRolesMax": "You can only add up to 3 role awards without premium! To add more roles, remove a role by typing `%prefix%removeRole` or buy premium.",
-            "tenRolesMax": "You can only add up to 10 role awards! If you really wish to add more role awards (which seems unlikely), please contact me on Discord for a custom premium plan (my Discord name is: xVaql#4581)",
-            "roleTooHigh": "The role you tried to assign is positioned higher or equal than my highest role, so I can't assign that role to users. Please move my role above the role you tried to assign, or move the role you tried to assign underneath my role and run this command again.\nIf you're having trouble adding a role award, you can very easily manage role awards on this server's online dashboard at <http://www.timeplayed.xyz/dashboard/%guildId%/role-awards>",
-            "alreadyAssigned": "That role is already assigned automatically in this server! You can't add two role awards to avoid collisons and unexpected errors, so please create another role for this award or remove the role with `%prefix%removeRole`\nIf you're having trouble adding a role award, you can very easily manage role awards on this server's online dashboard at <http://www.timeplayed.xyz/dashboard/%guildId%/role-awards>",
-            "success": "Success! Users will now automatically get the %role% role awarded when playing more than `%neededTime%/%timePeriod%` `%game%`.\n",
-            "defaultGameNote": "\nNote: you didn't specify a game, so I took the server's default game (`%game%`)"
-        },
-        "removeRole": {
-            "args": "",
-            "aliases": ["removereward", "deleterole", "deletereward", "removeaward", "deleteaward"],
-            "helpDescription": "Remove a playtime role award",
-            "category": "Admin commands",
-            "fullDescription": "This command removes a playtime role award, when running `%prefix%removeRole` without any arguments you will get a list with the current role awards, there you'll be able to choose which award to remove.",
-            "PMSupport": false
-        },
-        "showRoles": {
-            "args": "",
-            "aliases": ["showrewards", "rolelist", "rewardlist", "showawards"],
-            "helpDescription": "Show the roles award in this server",
-            "category": "Admin commands",
-            "fullDescription": "This command gives you a list of all role awards in the current server, with all their information provided.",
-            "PMSupport": false
+            "prefixMessage": "My current prefix in this server is: `%prefix%`",
+            "toChange": "To change my prefix in this server, run: `%prefix%setPrefix (new prefix)`",
+            "tooLong": "Please enter a prefix under 10 characters long!",
+            "success": "Success! I changed my prefix in this server from `%prefix%` to `%newPrefix%`"
         }
     }
 }

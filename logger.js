@@ -32,49 +32,6 @@ function clearup(callback) {
   })
 }
 
-function clearupGuildStats(callback) {
-  connection.query(`SELECT * FROM guildStats WHERE endDate IS NULL`, function(error, results, fields) {
-    var toEnd = [];
-    var toInsert = [];
-    results.forEach(result => {
-      var user = client.users.get(result.userID);
-      if(!user) return;
-      if(!user.presence.game) {
-        toEnd.push(user.id);
-      } else if(user.presence.game.name != result.game) {
-        toEnd.push(user.id);
-        toInsert.push([user.id, result.guildID, user.presence.game.name, new Date()]);
-      }
-    })
-
-    connection.query(`UPDATE guildStats SET endDate=? WHERE endDate IS NULL AND userID IN (?)`, [new Date(), toEnd], function(error, results, fields) {
-      connection.query(`INSERT INTO guildStats (userID, guildID, game, startDate) VALUES ?`, [toInsert], function(error, results, fields) {
-        callback();
-      })
-    })
-  })
-}
-
-var premiumGuilds = [];
-function updatePremiumGuilds() {
-  // Check connection health
-  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
-    if(err) {
-      console.log("Database disconnected, retrying updatePremiumGuilds in 10 seconds")
-      return setTimeout(updatePremiumGuilds, 5000);
-    }
-    // If connection is healthy
-    connection.query("SELECT guildID FROM premium", function(error, results, fields) {
-      if(!results) return;
-      premiumGuilds = results.map(e => e.guildID);
-      console.log("Premium list updated");
-      setTimeout(updatePremiumGuilds, 3600000);
-    })
-  })
-  
-}
-updatePremiumGuilds();
-
 var toCheck = [];
 function refresh() {
   // Check connection health
@@ -98,21 +55,21 @@ function refresh() {
           // If still playing a game
           if(oldMember.presence.game) {
             // If game changed
-            console.log(`NM: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
+            console.log(`${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name})`)
             toEnd.push(oldMember.id)
             toInsert.push([oldMember.id, date, newMember.presence.game.name])
           } else {
             // If started playing 
-            console.log(`NM: ${oldMember.displayName} started playing ${newMember.presence.game.name}`)
+            console.log(`${oldMember.displayName} started playing ${newMember.presence.game.name}`)
             toInsert.push([oldMember.id, date, newMember.presence.game.name])
           }
         } else if(oldMember.presence.game) {
           // If stopped playing
-          console.log(`NM: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
+          console.log(`${oldMember.displayName} stopped playing ${oldMember.presence.game.name}`)
           toEnd.push(oldMember.id)
         }
         if(oldMember.presence.status != newMember.presence.status && newMember.presence.status == "offline") {
-          console.log(`NM: ${oldMember.displayName} went offline`)
+          console.log(`${oldMember.displayName} went offline`)
           toLastOnline.push(oldMember.id)
         }
       })
@@ -126,54 +83,6 @@ function refresh() {
             })
           })
         })
-      })
-    })
-  })
-}
-
-var toCheckGuildStats = [];
-function refreshGuildStats() {
-  // Check connection health
-  connection.query("SELECT * FROM lastRefresh", function(err, results, fields) {
-    if(err) {
-      console.log("Database disconnected, retrying guild stats refresh in 10 seconds")
-      return setTimeout(refreshGuildStats, 5000);
-    }
-    // If connection is healthy
-    var toInsert = [];
-    var toEnd = [];
-    toCheckGuildStats.forEach(arr => {
-      var oldMember = arr[0];
-      var newMember = arr[1];
-      var guildID = arr[2];
-      var date = arr[3];
-      if(newMember.presence.game) {
-        // If still playing a game
-
-        // Return if game still same
-        if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-
-        if(oldMember.presence.game) {
-          // If game changed
-          console.log(`GS: ${oldMember.displayName} changed game (from ${oldMember.presence.game.name} to ${newMember.presence.game.name} in ${guildID})`)
-          toEnd.push(oldMember.id)
-          toInsert.push([oldMember.id, guildID, date, newMember.presence.game.name])
-        } else {
-          // If started playing
-          console.log(`GS: ${oldMember.displayName} started playing ${newMember.presence.game.name} (in ${guildID})`)
-          toInsert.push([oldMember.id, guildID, date, newMember.presence.game.name])
-        }
-      } else if(oldMember.presence.game) {
-        // If stopped playing
-        console.log(`GS: ${oldMember.displayName} stopped playing ${oldMember.presence.game.name} (in ${guildID})`)
-        toEnd.push(oldMember.id)
-      }
-    })
-
-    connection.query("UPDATE guildStats SET endDate=? WHERE endDate IS NULL AND userID IN (?)", [new Date(), toEnd], function(error, results, fields) {
-      connection.query("INSERT INTO guildStats (userID, guildID, startDate, game) VALUES ?", [toInsert], function(error, results, fields) {
-        setTimeout(refreshGuildStats, 5000)
-        toCheckGuildStats = []
       })
     })
   })
@@ -218,20 +127,6 @@ client.on("presenceUpdate", (oldMember, newMember) => {
   if(sharedGuilds.indexOf(oldMember.guild.id) != 0) return;
 
   toCheck.push([oldMember, newMember, new Date()])
-})
-
-// For server stats logging
-client.on("presenceUpdate", (oldMember, newMember) => {
-  if(oldMember.user.bot) return;
-  var guild = oldMember.guild;
-
-  // Return if guild isn't premium
-  if(!keys.selfhost && !premiumGuilds.includes(guild.id)) return;
-  // Return if same
-  if(oldMember.presence.game && newMember.presence.game && oldMember.presence.game.name.toLowerCase() == newMember.presence.game.name.toLowerCase()) return;
-
-  toCheckGuildStats.push([oldMember, newMember, guild.id, new Date()]);
-
 })
 
 client.on('error', function() {

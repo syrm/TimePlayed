@@ -18,11 +18,11 @@ module.exports = function(obj) {
     var gameMessage;
     var game = ""
     if(!meantUser.presence.game) {
-    gameMessage = lang.commands.status.noGame
+      gameMessage = lang.commands.status.noGame
     } else {
-    lang = tools.replaceLang("%type%", types[meantUser.presence.game.type], lang);
-    gameMessage = lang.commands.status.gamePlaying
-    game = meantUser.presence.game.name;
+      lang = tools.replaceLang("%type%", types[meantUser.presence.game.type], lang);
+      gameMessage = lang.commands.status.gamePlaying
+      game = meantUser.presence.game.name;
     }
     
     var presence = presences[meantUser.presence.status][0]
@@ -47,7 +47,11 @@ module.exports = function(obj) {
     embed.setThumbnail(`https://cdn.discordapp.com/app-assets/${meantUser.presence.game.applicationID}/${meantUser.presence.game.assets.largeImage}.png`)
     embed.addField("Game playing", `${gameMessage}:\n**${meantUser.presence.game.name}**\n${meantUser.presence.game.details}\n${meantUser.presence.game.state}`)
     } else {
-    embed.addField("Game playing", `${gameMessage} **${game}**`)
+      if(game) {
+        embed.addField("Game playing", `${gameMessage} **${game}**`)
+      } else {
+        embed.addField("Game playing", `${gameMessage}`)
+      }
     }
     lastOnline(meantUser.id, meantUser.presence, function(string, date) {
         if(meantUser.bot) game = undefined;

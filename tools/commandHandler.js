@@ -26,9 +26,8 @@ function since(string) {
 }
 function mention(string) {
   if(!string) return false;
-  var regex = /^<@[0-9]{18}>$/;
-  var regex2 = /^<@![0-9]{18}>$/;
-  return regex.test(string) || regex2.test(string)
+  var regex = /^<@!?[0-9]{18}>$/;
+  return regex.test(string)
 }
 function typeOf(string) {
   string = string.toLowerCase()
@@ -40,60 +39,6 @@ function typeOf(string) {
 }
 
 module.exports = function(args, defaultGame, command) {
-  if(command == "addrole") {
-    var results = {wrongSyntax: false, defaultGame: false}
-    args.forEach((currentArg, i) => {
-      if(results.since) return;
-      if(since(currentArg.split("/")[0]) && since(currentArg.split("/")[1])) {
-        results.since = currentArg;
-      } 
-      if(args[i + 1]) {
-        results.game = args.slice(i + 1, 25).join(" ")
-      } else {
-        results.game = defaultGame
-        results.defaultGame = true;
-      }
-      if(arg.slice(0, i)) return results.role = arg.slice(0, 1).join(" ")
-
-    })
-    if(!results.role || !results.since) results.wrongSyntax = true;
-    return results;
-  }
-  /* if(command == "setconfig") {
-    var results = {wrongSyntax: false}
-    if(!args[0] || !args[1]) results.wrongSyntax = true;
-    results.key = args[0]
-    results.value = args.slice(1).join(" ")
-    results.type = typeOf(args.slice(1).join(" "))
-    return results;
-  } */
-  if(command == "serverstats") {
-    var results = {wrongSyntax: false, gamesOnly: false, sortBy: "time"}
-    var game = JSON.parse(JSON.stringify(args));
-    args.forEach(arg => {
-      function rm() {
-        var i = game.indexOf(arg);
-        if (i > -1) {
-          game.splice(i, 1);
-        }
-      }
-      if(/-?games\W?only|only\W?games/gmi.test(arg)) {
-        results.gamesOnly = true;
-        rm();
-      }
-      if(/-?count/gmi.test(arg)) {
-        results.sortBy = "count";
-        rm();
-      }
-      if(/-?time/gmi.test(arg)) {
-        rm();
-      }
-    })
-    if(game.length > 0) {
-      results.game = game.join(" ");
-    }
-    return results;
-  }
   var results = {wrongSyntax: false}
   var mentionIndex;
   var sinceIndex;
@@ -124,12 +69,7 @@ module.exports = function(args, defaultGame, command) {
     }
   })
   otherText = otherText.map(e => {return e.arg})
-  if(otherText.length > 0) {
-    results.other = otherText.join(" ");
-    results.defaultGame = false;
-  } else {
-    results.other = defaultGame;
-    results.defaultGame = true;
-  }
+  results.other = otherText.join(" ") || undefined;
+  console.log(results)
   return results;
 }

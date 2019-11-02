@@ -12,16 +12,6 @@ client.on("ready", () => {
             userGuilds.push([member.id, guild.id])
         })
     })
-    /* connection.query("SELECT * FROM userGuilds ORDER BY userID LIMIT 5", function(error, results, fields) {
-        // results = results.map(function(e) {return [e.userID, e.guildID]});
-        userGuilds.forEach(function(obj) {
-            
-        })
-        console.log(results);
-        console.log(userGuilds);
-        userGuilds.filter(function(e) {return results.includes(e)})
-        console.log(userGuilds);
-    }) */
 
     connection.query("DELETE FROM userGuilds", function(error, results, fields) {
     if(error) throw error;

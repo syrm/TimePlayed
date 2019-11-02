@@ -6,10 +6,7 @@ exports.getConnection = require('./connection')
 
 // Individual functions
 exports.timePlayed = require('./timePlayed')
-exports.bulkTimeplayed = require('./bulkTimeplayed')
-exports.bulkTimeplayedCustomSince = require('./bulkTimeplayedCustomSince')
 exports.getGuildConfig = require('./getGuildConfig')
-exports.getGuildConfigs = require('./getGuildConfigs')
 exports.getStartDate = require('./getStartDate')
 exports.topGames = require('./topGames')
 exports.commandHandler = require('./commandHandler')

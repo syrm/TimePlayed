@@ -67,13 +67,6 @@ function wrongSyntax(message, command, lang) {
   return message.channel.send({embed})
 }
 
-function log(message) {
-  if(beta || selfHost) return;
-  var logChannel = client.channels.get("462909240298962944")
-  logChannel.send(`\`${message}\``)
-  return message;
-}
-
 function postStats() {
   dbl.postStats(client.guilds.size)
     .then(err => console.log("Stats posted!"))
@@ -102,7 +95,6 @@ Object.keys(en.commands).forEach(command => {
 })
 client.on("ready", () => {
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
-  log("Started up!")
   console.log(`Bot is ready!`);
   console.log(`I'm in ${client.guilds.size} guilds.`)
   setInterval(() => {
@@ -128,12 +120,10 @@ client.on("guildCreate", guild => {
   })
 
   console.log(`${Date()}: Joined new guild: ${guild.name}, sent welcome message: ${found}`)
-  log(`Joined a new server (current server count: ${client.guilds.size})`)
 });
 client.on("guildDelete", guild => {
   postStats()
   client.user.setActivity(`${client.users.size} users | !!help`, { type: 'WATCHING' });
-  log(`Left a server (current server count: ${client.guilds.size})`)
   console.log(`${Date()}: Left guild: ${guild.name}`)
 })
 
@@ -274,8 +264,7 @@ client.on("message", message => {
         lang = tools.replaceLang(/%personUpper%+/g, "You", lang)
       }
       lang = bulkReplaceLang([["%be%", toBe], ["%have%", toHave], ["%person%", person], ["%possessive%", possessive], ["%prefix%", guildConf.prefix], ["%guildId%", guildID], ["%clientId%", client.user.id]], lang)
-      if(handledArgs.game) lang = tools.replaceLang(/%game%+/g, handledArgs.game, lang)
-      if(command != "timeplayed" && command != "playing") lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
+      if(handledArgs.other && command != "timeplayed") lang = tools.replaceLang(/%game%+/g, handledArgs.other, lang)
   
       var result;
       Object.keys(lang.commands).forEach(commandName => {
@@ -304,14 +293,7 @@ client.on("message", message => {
       if(PM && mention) return message.reply(lang.errors.noPMMention)
   
       // Execute the private check (async)
-      tools.termsCheck(message.author.id, id, guildID, function(results) {
-        accept = results[0]
-        if(!keys.selfhost) {
-          premium = results[1];
-        } else {
-          premium = true;
-        }
-        
+      tools.termsCheck(message.author.id, id, function(accept) {
         connection.query(`SELECT count(*) FROM privateUsers WHERE userID=?`, [id], function(error, results, fields) {
           var private = results[0]["count(*)"] > 0;
           var termsMSG;
@@ -335,11 +317,6 @@ client.on("message", message => {
       
           // If syntax of command is wrong, return and reply a message
           if(handledArgs.wrongSyntax) return wrongSyntax(message, command, lang)
-      
-          // If user ran timeplayed without game, redirect to topplayed command
-          if(command == "timeplayed" && handledArgs.defaultGame == true) {
-            command = "topplayed";
-          }
   
           // Get the start date of the user
           tools.getStartDate(id, function(startDate) {
@@ -352,8 +329,7 @@ client.on("message", message => {
                 handledArgs: handledArgs,
                 guildConf: guildConf,
                 lang: lang,
-                meantUser: meantUser,
-                premium: premium
+                meantUser: meantUser
               }
               if(execute[command]) {
                 execute[command].call(undefined, info);
