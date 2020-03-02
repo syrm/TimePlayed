@@ -1,4 +1,4 @@
-# THIS PROJECT HAS BEEN DEPRECATED. YOU WILL NO LONGER RECEIVE SUPPORT FOR ANY ISSUES YOU HAVE WITH THIS CODE
+## THIS PROJECT HAS BEEN DEPRECATED. YOU WILL NO LONGER RECEIVE SUPPORT FOR ANY ISSUES YOU HAVE WITH THIS CODE
 [![Discord Bots](https://discordbots.org/api/widget/status/433625399398891541.svg)](https://discordbots.org/bot/433625399398891541)
 [![Discord Bots](https://discordbots.org/api/widget/servers/433625399398891541.svg?noavatar=true)](https://discordbots.org/bot/433625399398891541)
 [![Discord Bots](https://discordbots.org/api/widget/owner/433625399398891541.svg?noavatar=true)](https://discordbots.org/bot/433625399398891541)
